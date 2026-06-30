@@ -1,0 +1,40 @@
+# === Archivos internos del equipo (no para el profe) ===
+PC05.txt
+guia_proyecto_final_mineria_datos.md
+Planificacion.md
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# === Jupyter ===
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# === Datos grandes (nunca subir a Git) ===
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# === Modelos serializados ===
+models/*
+!models/.gitkeep
+
+# === Kaggle cache ===
+/root/.cache/kagglehub/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# === Entorno ===
+.env
+.venv/
+venv/
+env/
