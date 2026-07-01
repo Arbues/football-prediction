@@ -1,0 +1,53 @@
+Simula el cuadro completo del Mundial 2026 (16avos -> final + 3er puesto) con el
+modelo propuesto (Stacking) y genera una web (docs/bracket.html) con el resultado.
+
+Fuera de distribución (modelos entrenados con clubes). Cada cruce se predice en las DOS
+orientaciones y se promedia para cancelar el sesgo de localía (sede neutral): decide el
+Elo, la variable dominante. Los 7 partidos ya jugados usan el resultado REAL; el resto,
+la predicción del modelo. En eliminatoria no hay empate: avanza el equipo con mayor
+probabilidad de ganar (la masa de empate se reparte).
+
+== 16avos (izq) ==
+  [real] Alemania   (1 (3)) vs Paraguay   (1 (4))  -> Paraguay
+  [real] Francia    (    3) vs Suecia     (    0)  -> Francia
+  [real] Sudáfrica  (    0) vs Canadá     (    1)  -> Canadá
+  [real] P. Bajos   (1 (2)) vs Marruecos  (1 (3))  -> Marruecos
+  [sim ] Portugal   (  42%) vs Croacia    (  26%)  -> Portugal
+  [sim ] España     (  66%) vs Austria    (  13%)  -> España
+  [sim ] EE. UU.    (  41%) vs Bosnia     (  27%)  -> EE. UU.
+  [sim ] Bélgica    (  46%) vs Senegal    (  24%)  -> Bélgica
+== 8avos (izq) ==
+  [sim ] Paraguay   (  11%) vs Francia    (  68%)  -> Francia
+  [sim ] Canadá     (  23%) vs Marruecos  (  47%)  -> Marruecos
+  [sim ] Portugal   (  24%) vs España     (  46%)  -> España
+  [sim ] EE. UU.    (  20%) vs Bélgica    (  51%)  -> Bélgica
+== 4tos (izq) ==
+  [sim ] Francia    (  55%) vs Marruecos  (  18%)  -> Francia
+  [sim ] España     (  53%) vs Bélgica    (  19%)  -> España
+== Semifinal (izq) ==
+  [sim ] Francia    (  31%) vs España     (  37%)  -> España
+== 16avos (der) ==
+  [real] Brasil     (    2) vs Japón      (    1)  -> Brasil
+  [real] C. Marfil  (    1) vs Noruega    (    2)  -> Noruega
+  [real] México     (    2) vs Ecuador    (    0)  -> México
+  [sim ] Inglaterra (  68%) vs R.D. Congo (  11%)  -> Inglaterra
+  [sim ] Argentina  (  74%) vs Cabo Verde (   9%)  -> Argentina
+  [sim ] Australia  (  37%) vs Egipto     (  30%)  -> Australia
+  [sim ] Suiza      (  43%) vs Argelia    (  25%)  -> Suiza
+  [sim ] Colombia   (  53%) vs Ghana      (  18%)  -> Colombia
+== 8avos (der) ==
+  [sim ] Brasil     (  54%) vs Noruega    (  19%)  -> Brasil
+  [sim ] México     (  15%) vs Inglaterra (  60%)  -> Inglaterra
+  [sim ] Argentina  (  69%) vs Australia  (  11%)  -> Argentina
+  [sim ] Suiza      (  29%) vs Colombia   (  38%)  -> Colombia
+== 4tos (der) ==
+  [sim ] Brasil     (  32%) vs Inglaterra (  35%)  -> Inglaterra
+  [sim ] Argentina  (  58%) vs Colombia   (  17%)  -> Argentina
+== Semifinal (der) ==
+  [sim ] Inglaterra (  27%) vs Argentina  (  42%)  -> Argentina
+== 3er PUESTO ==
+  [sim ] Francia    (  37%) vs Inglaterra (  31%)  -> Francia
+== FINAL ==
+  [sim ] España     (  34%) vs Argentina  (  35%)  -> Argentina
+
+*** CAMPEÓN DEL MUNDO (simulado): Argentina ***
