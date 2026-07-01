@@ -1,0 +1,31 @@
+======================================================================
+PREPROC 02 - RECUPERACION DE ELO POR JOIN TEMPORAL (date <= MatchDate)
+======================================================================
+Filas: 230,554
+EloRatings: 245,033 registros, 895 clubes normalizados
+Nulos ANTES  -> HomeElo 88,959 (38.6%) | AwayElo 89,028 (38.6%)
+
+Cobertura de nombres tras alias+normalizacion: 695/1,206 equipos (57.6%)
+
+Nulos DESPUES -> HomeElo 78,336 (34.0%) | AwayElo 78,369 (34.0%)
+Elo REAL recuperado por join -> Home 10,623 | Away 10,659
+
+De los 78,336 Home nulos restantes, 73,623 (94.0%) son equipos AUSENTES de EloRatings
+  -> ese nulo es irrecuperable por join; se imputara por mediana de
+     liga (train-only) + flag elo_missing en el paso 05.
+
+NULO RESIDUAL DE HomeElo POR LIGA (top 12):
+  ARG   100.0% nulo
+  BRA   100.0% nulo
+  CHN   100.0% nulo
+  JAP   100.0% nulo
+  IRL   100.0% nulo
+  MEX   100.0% nulo
+  USA   100.0% nulo
+  SUI   100.0% nulo
+  SC3    99.1% nulo
+  SC2    92.1% nulo
+  EC     92.0% nulo
+  ROM    77.5% nulo
+
+[guardado] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/data/processed/_matches_elo.parquet  (230,554 x 14)

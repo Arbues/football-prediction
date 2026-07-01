@@ -1,0 +1,26 @@
+======================================================================
+PREPROC 03 - INGENIERIA DE FEATURES (SOLO PASADO)
+======================================================================
+Filas: 230,554  | ventana rolling = 5
+
+(1) Rolling goles/descanso/racha por equipo: OK
+(2) Head-to-head (enfrentamientos previos): OK
+(3) is_top_league: 43,708 filas en top-5
+
+(4) Features nuevas (12): ['away_ga5', 'home_ga5', 'away_gf5', 'home_gf5', 'away_rest_days', 'home_rest_days', 'away_win_streak', 'home_win_streak', 'h2h_played', 'h2h_home_winrate', 'h2h_avg_goals', 'is_top_league']
+
+RESUMEN DE NULOS EN FEATURES NUEVAS (se imputan en 05):
+  away_ga5             nulos     603 ( 0.26%)  media=1.303
+  home_ga5             nulos     614 ( 0.27%)  media=1.332
+  away_gf5             nulos     603 ( 0.26%)  media=1.334
+  home_gf5             nulos     614 ( 0.27%)  media=1.305
+  away_rest_days       nulos     603 ( 0.26%)  media=11.583
+  home_rest_days       nulos     614 ( 0.27%)  media=11.705
+  away_win_streak      nulos       0 ( 0.00%)  media=0.698
+  home_win_streak      nulos       0 ( 0.00%)  media=0.578
+  h2h_played           nulos       0 ( 0.00%)  media=9.361
+  h2h_home_winrate     nulos  22,410 ( 9.72%)  media=0.352
+  h2h_avg_goals        nulos  22,410 ( 9.72%)  media=2.620
+  is_top_league        nulos       0 ( 0.00%)  media=0.190
+
+[guardado] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/data/processed/_matches_features.parquet  (230,554 x 24)

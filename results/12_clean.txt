@@ -1,0 +1,29 @@
+======================================================================
+PREPROC 01 - LIMPIEZA BASE Y CONTRATO DE COLUMNAS
+======================================================================
+Dataset crudo: 230,557 filas x 48 columnas
+
+(1) Filas sin FTResult descartadas: 3 -> quedan 230,554
+
+(2) CONTRATO DE COLUMNAS
+  Conservadas (13): ['Division', 'MatchDate', 'HomeTeam', 'AwayTeam', 'HomeElo', 'AwayElo', 'Form3Home', 'Form5Home', 'Form3Away', 'Form5Away', 'FTHome', 'FTAway', 'FTResult']
+  Descartadas (35):
+    - fuga post-partido (15): ['HTHome', 'HTAway', 'HTResult', 'HomeShots', 'AwayShots', 'HomeTarget', 'AwayTarget', 'HomeFouls', 'AwayFouls', 'HomeCorners', 'AwayCorners', 'HomeYellow', 'AwayYellow', 'HomeRed', 'AwayRed']
+    - cuotas de mercado (13): ['OddHome', 'OddDraw', 'OddAway', 'MaxHome', 'MaxDraw', 'MaxAway', 'Over25', 'Under25', 'MaxOver25', 'MaxUnder25', 'HandiSize', 'HandiHome', 'HandiAway']
+    - cierres bookmaker (6): ['C_LTH', 'C_LTA', 'C_VHD', 'C_VAD', 'C_HTB', 'C_PHB']
+    - sin valor (MatchTime): ['MatchTime']
+  NOTA: FTHome/FTAway se conservan SOLO como insumo de features
+        historicas (03); se eliminan antes de la matriz final.
+
+(3) Ordenado por MatchDate (desempate Division, HomeTeam).
+    Rango temporal: 2000-07-28 -> 2025-06-01
+
+(4) NULOS EN COLUMNAS CONSERVADAS
+  HomeElo        88,959  (38.58%)
+  AwayElo        89,028  (38.61%)
+  Form3Home       1,498  (0.65%)
+  Form5Home       1,498  (0.65%)
+  Form3Away       1,498  (0.65%)
+  Form5Away       1,498  (0.65%)
+
+[guardado] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/data/processed/_matches_clean.parquet  (230,554 x 14)

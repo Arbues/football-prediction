@@ -4,6 +4,65 @@
 
 ---
 
+## [2026-07-01 ~07:30] — Arbués — Fase 2 (Preprocessing) en scripts + Plan de Modelado
+
+**Qué hice (script-first, sin notebook aún por decisión del usuario):**
+- 6 scripts en `src/preprocessing/` (`_common.py` + `01`…`06`), Run All limpio de
+  cero (0 stderr). Cada uno vuelca un `.txt` en `results/` (12–17) y las figuras PCA.
+- **01_clean**: contrato del EDA — descarta 35 cols (15 fuga post-partido, 13 cuotas,
+  6 cierres, MatchTime), conserva FTHome/FTAway SOLO como insumo histórico, elimina
+  3 filas sin target, ordena por MatchDate. → 230 554 × 14.
+- **02_elo_join**: recupera Elo REAL con `merge_asof` (date≤MatchDate) + armonización
+  de nombres. Recupera ~10.6k filas (nulo 38.6%→34.0%). **Hallazgo**: el 94% del nulo
+  restante son equipos AUSENTES de EloRatings (solo cubre 19 países europeos; ARG, BRA,
+  CHN, JAP, USA, MEX… 100% sin Elo). El nulo es estructural por liga → flag `elo_missing`.
+- **03_feature_engineering** (todo con SOLO pasado): rolling goles a favor/contra últ.5,
+  rest_days, win_streak (por equipo, formato largo + shift), h2h (winrate del local vs
+  rival + goles medios, recorrido cronológico), is_top_league. Nulos = primeros partidos.
+- **04_temporal_split**: holdout por fecha train≤2021 / val 2022-23 / test 2024-25
+  (83/11/6%). Frontera limpia verificada. Balance estable con leve deriva (H 44.8→43.4).
+- **05_pipeline_transform**: imputación train-only (Elo mediana de liga+global fallback+flag;
+  Form→0; gf5/ga5/rest→mediana train; h2h_winrate→0.5, h2h_goals→mediana), diffs
+  (elo/form5/form3/gf5/ga5), `ColumnTransformer` (StandardScaler 22 continuas + passthrough
+  2 flags + OneHot 38 ligas) fit SOLO en train. → **62 features**. Guarda
+  `X_/y_{train,val,test}.parquet` + `index_ref` + `feature_names.json` +
+  `models/preprocessor.joblib`.
+- **06_pca**: PCA sobre las 22 continuas. **5 autovalores nulos** = los 5 diffs son
+  combinaciones lineales exactas (confirma el VIF del EDA). 95% varianza en **k=13**
+  (codo en 11). Guarda variante `X_*_pca.parquet` (13 PC + flags + one-hot). Figuras
+  `pca_scree.png`, `pca_cumvar.png`.
+
+**Verificación anti-leakage** (LogReg balanced sin tunear, train→val): acc 0.448,
+**f1_macro 0.420**, recall D 0.22. Supera al Dummy en f1_macro (0.20→0.42) pero apenas
+en accuracy → prueba viva de por qué optimizar f1_macro y no accuracy. Sin fuga
+(no hay accuracy sospechosa >65%; sin odds el techo honesto es ~50-55%).
+
+**Plan de modelado** en `docs/fases/plan-modelado.md`: tabla de trazabilidad
+EDA→modelado; validación temporal + TimeSeriesSplit (con teoría VC/Hoeffding);
+class_weight+SMOTE; f1_macro + suite 3.9 + Wilcoxon; modelos con fundamentación
+matemática anclada a las clases (DT Clase-6, SVM Clase-7, RF/Boosting Clase-9, PCA
+Clase-3) + valor añadido (LogReg/XGB/LGBM/CatBoost/Voting-Stacking) con sus fórmulas;
+selección de hiperparámetros estilo PC-4 (curvas de validación); GPU RTX 3060.
+
+**Decisiones tomadas con el usuario (A1–B6):** Elo=híbrido join+mediana-liga+flag;
+SIN cuotas (versión honesta); split por corte; TODAS las derivadas; drop nombres de
+equipo (identidad en Elo/forma); PCA sí (raw+PCA); parquet; class_weight+SMOTE;
+optimizar f1_macro; GPU + dataset completo. Añadir LightGBM/CatBoost con fórmulas.
+
+**Precisiones de las clases (subagentes leyeron los PDFs):** SVM Clase-7 llega a
+dual+KKT margen duro (kernel/C vía Bishop); Ensemble Clase-9 cubre AdaBoost completo
+pero Gradient Boosting solo conceptual (vía Hastie); el sílabo lista Naive Bayes y
+Redes Neuronales como temas → NB entra de baseline barato alineado al curso.
+
+**Para el siguiente (Fase 3 — Sergio):** `data/processed/X_/y_{train,val,test}.parquet`
+listos (matriz cruda con nombres para SHAP + variante PCA). Instalar
+`lightgbm catboost imbalanced-learn` en la máquina de entrenamiento. El notebook
+`2.0-preprocessing.ipynb` se arma cuando el usuario lo pida (portando estos scripts).
+
+**Pendiente:** notebook `2.0-preprocessing.ipynb` (a pedido).
+
+---
+
 ## [2026-07-01 ~01:35] — Arbués — Nota de METODOLOGÍA del EDA (para paper + expo)
 
 **Pregunta:** ¿de qué paper tomamos la metodología del EDA? ¿En qué nos basamos?

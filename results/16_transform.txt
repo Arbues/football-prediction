@@ -1,0 +1,21 @@
+======================================================================
+PREPROC 05 - IMPUTACION TRAIN-ONLY, DIFFS, ESCALADO Y ONE-HOT
+======================================================================
+
+(1) IMPUTACION (medianas calculadas SOLO en train):
+  Elo: mediana global train = 1504.9; ligas con mediana propia = 30; flag elo_missing.
+  Form3/Form5: imputadas a 0 (sin historial en primeras jornadas).
+  gf5/ga5/rest_days: imputadas a la mediana de train.
+  h2h: winrate->0.5 (previa neutral); avg_goals->mediana train 2.58.
+
+(2) Diffs local-visita anadidos: elo_diff, form5_diff, form3_diff, gf5_diff, ga5_diff
+
+(3) ColumnTransformer fit en train: 62 features de salida
+    continuas=22 (StandardScaler) | flags=2 | one-hot Division=38
+
+SHAPES POR SPLIT:
+  train  X=(191099, 62)  y=(191099,)  (H/D/A = 0.448/0.266/0.286)
+  val    X=(24669, 62)  y=(24669,)  (H/D/A = 0.439/0.262/0.300)
+  test   X=(14786, 62)  y=(14786,)  (H/D/A = 0.434/0.264/0.302)
+
+[guardado] X_/y_{train,val,test}.parquet, index_ref.parquet, feature_names.json, models/preprocessor.joblib

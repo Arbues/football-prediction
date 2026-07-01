@@ -1,0 +1,21 @@
+======================================================================
+PREPROC 04 - SPLIT TEMPORAL POR FECHA
+======================================================================
+Corte: train <= 2021 | val 2022-2023 | test 2024-2025
+
+TAMANO Y RANGO POR SPLIT:
+  train   191,099 filas (82.9%)  [2000-07-28 -> 2021-12-31]
+  val      24,669 filas (10.7%)  [2022-01-01 -> 2023-12-31]
+  test     14,786 filas ( 6.4%)  [2024-01-01 -> 2025-06-01]
+
+Frontera temporal limpia (train<val<test): True
+
+BALANCE DE CLASES POR SPLIT (%):
+  split        H       D       A
+  train    44.81   26.57   28.63
+  val      43.89   26.16   29.95
+  test     43.43   26.37   30.20
+  -> la caida de H% en val/test (efecto COVID 2020-21 y post) es
+     justamente lo que el split temporal preserva y el aleatorio borraria.
+
+[guardado] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/data/processed/_matches_split.parquet  (230,554 x 26)

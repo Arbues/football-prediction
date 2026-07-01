@@ -1,0 +1,45 @@
+======================================================================
+PREPROC 06 - PCA SOBRE EL BLOQUE CONTINUO
+======================================================================
+Continuas para PCA: 22 | pasan sin reducir: 40
+
+Componentes: 22
+k para 95% varianza: 13
+k por criterio del codo: 11
+
+VARIANZA POR COMPONENTE:
+   PC  autovalor    %var   %acum
+    1      6.156  27.98%  27.98%
+    2      3.356  15.25%  43.24%
+    3      1.650   7.50%  50.73%
+    4      1.643   7.47%  58.20%
+    5      1.237   5.62%  63.82%
+    6      1.162   5.28%  69.11%
+    7      1.144   5.20%  74.30%
+    8      0.940   4.27%  78.58%
+    9      0.851   3.87%  82.45%
+   10      0.840   3.82%  86.27%
+   11      0.758   3.44%  89.71%
+   12      0.656   2.98%  92.69%
+   13      0.580   2.64%  95.33%
+   14      0.413   1.88%  97.20%
+   15      0.287   1.31%  98.51%
+   16      0.210   0.95%  99.46%
+   17      0.118   0.54% 100.00%
+   18      0.000   0.00% 100.00%
+   19      0.000   0.00% 100.00%
+   20      0.000   0.00% 100.00%
+   21      0.000   0.00% 100.00%
+   22      0.000   0.00% 100.00%
+
+Direcciones de varianza ~0 (colinealidad de los diffs): 5
+-> confirma que elo_diff/form5_diff/gf5_diff son combinaciones lineales
+   exactas; PCA las colapsa. Se adopta k = 13 (criterio 95%).
+
+SHAPES VARIANTE PCA:
+  train  (191099, 53)  (13 PC + 40 flags/one-hot)
+  val    (24669, 53)  (13 PC + 40 flags/one-hot)
+  test   (14786, 53)  (13 PC + 40 flags/one-hot)
+
+[figuras] pca_scree.png, pca_cumvar.png
+[guardado] X_{train,val,test}_pca.parquet
