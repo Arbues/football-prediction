@@ -1,15 +1,18 @@
-"""Demo de inferencia: predice dieciseisavos de un Mundial con los modelos entrenados.
+"""Demo de inferencia: predice los dieciseisavos del Mundial 2026 con los modelos.
 
 ADVERTENCIA (fuera de distribución): los modelos se entrenaron con fútbol de CLUBES
 (ligas 2000-2025), no con selecciones. Aquí se aplica el pipeline real de inferencia
 (preprocessor.joblib + modelo) sobre vectores construidos a mano: todas las variables
 se dejan SIMÉTRICAS salvo el Elo, de modo que la predicción la gobiernan `elo_diff`
-(la variable dominante según SHAP) y el sesgo de localía aprendido. El estadio de un
-Mundial es neutral y en eliminatoria no hay empate real (penales), así que esto es un
-demo del pipeline, no un pronóstico confiable. Los Elo son aproximados y el bracket es
-ilustrativo (el real no está definido).
+(la variable dominante según SHAP) y el sesgo de localía aprendido. El "local" es solo
+el primer equipo del emparejamiento (el estadio del Mundial es neutral, así que ese
+sesgo es una distorsión conocida). En eliminatoria no hay empate real (penales). Los Elo
+son aproximados (World Football Elo, orden de magnitud). Emparejamientos reales de los
+dieciseisavos 2026 (fuentes: Wikipedia y Yahoo Sports, jul-2026). Es un demo del
+pipeline, no un pronóstico confiable.
 """
 import json
+import unicodedata
 import warnings
 
 import joblib
@@ -19,23 +22,44 @@ import _common as C
 
 warnings.filterwarnings("ignore")
 
-# Elo aproximado de selecciones (World Football Elo, orden de magnitud, mediados 2026)
+
+def _norm(s):
+    """Normaliza para comparar nombres sin tildes (Canadá == Canada)."""
+    s = unicodedata.normalize("NFD", s)
+    return "".join(c for c in s if unicodedata.category(c) != "Mn").strip().lower()
+
+# Elo aproximado de selecciones (World Football Elo, mediados 2026)
 ELO = {
-    "Argentina": 2145, "Francia": 2100, "España": 2120, "Inglaterra": 2055,
-    "Brasil": 2035, "Portugal": 2015, "Paises Bajos": 1995, "Belgica": 1955,
-    "Alemania": 1965, "Italia": 1985, "Croacia": 1930, "Uruguay": 1920,
-    "Colombia": 1905, "Marruecos": 1900, "Suiza": 1875, "Dinamarca": 1870,
-    "Japon": 1850, "Senegal": 1850, "Ecuador": 1830, "Estados Unidos": 1800,
-    "Mexico": 1800, "Corea": 1785, "Canada": 1785, "Australia": 1755, "Peru": 1750,
+    "Argentina": 2130, "España": 2120, "Francia": 2085, "Inglaterra": 2050,
+    "Brasil": 2030, "Portugal": 2005, "Paises Bajos": 1990, "Alemania": 1955,
+    "Belgica": 1945, "Croacia": 1920, "Colombia": 1900, "Marruecos": 1895,
+    "Noruega": 1860, "Suiza": 1855, "Japon": 1845, "Senegal": 1840,
+    "Ecuador": 1825, "Suecia": 1810, "Mexico": 1800, "Estados Unidos": 1795,
+    "Austria": 1790, "Costa de Marfil": 1790, "Canada": 1785, "Argelia": 1770,
+    "Australia": 1745, "Ghana": 1730, "Bosnia": 1720, "Paraguay": 1720,
+    "Egipto": 1710, "RD Congo": 1690, "Sudafrica": 1680, "Cabo Verde": 1620,
 }
 
-# Dieciseisavos ilustrativos (bracket real no definido)
-MATCHES = [
-    ("Argentina", "Australia"), ("España", "Japon"), ("Francia", "Senegal"),
-    ("Brasil", "Mexico"), ("Inglaterra", "Ecuador"), ("Portugal", "Suiza"),
-    ("Paises Bajos", "Estados Unidos"), ("Alemania", "Croacia"),
-    ("Uruguay", "Colombia"), ("Peru", "Marruecos"),
+# Dieciseisavos de final Mundial 2026. (local, visitante, resultado_real | None si pendiente)
+FIXTURES = [
+    ("Canada", "Sudafrica", "Canadá 1-0  → Canadá"),
+    ("Brasil", "Japon", "Brasil 2-1  → Brasil"),
+    ("Paraguay", "Alemania", "1-1, 4-3 pen  → Paraguay"),
+    ("Marruecos", "Paises Bajos", "1-1, 3-2 pen  → Marruecos"),
+    ("Noruega", "Costa de Marfil", "Noruega 2-1  → Noruega"),
+    ("Francia", "Suecia", "Francia 3-0  → Francia"),
+    ("Mexico", "Ecuador", "México 2-0  → México"),
+    ("Inglaterra", "RD Congo", None),
+    ("Belgica", "Senegal", None),
+    ("Estados Unidos", "Bosnia", None),
+    ("España", "Austria", None),
+    ("Portugal", "Croacia", None),
+    ("Suiza", "Argelia", None),
+    ("Australia", "Egipto", None),
+    ("Argentina", "Cabo Verde", None),
+    ("Colombia", "Ghana", None),
 ]
+MATCHES = [(h, a) for h, a, _ in FIXTURES]
 
 
 def raw_row(home, away):
@@ -62,15 +86,26 @@ def build_matrix(pre, feats):
 
 
 def predict_table(model, name, X):
-    """Devuelve texto con la tabla de predicciones (proba en orden [A,D,H])."""
+    """Tabla de predicciones (proba en orden [A,D,H]) + comparación con lo real."""
     P = model.predict_proba(X)
     lines = [f"===== {name} =====",
-             f"{'Partido':32} {'Local(H)':>9} {'Empate(D)':>10} {'Visita(A)':>10}   Predicción"]
-    for (h, a), p in zip(MATCHES, P):
+             f"{'Partido':30} {'H':>6} {'D':>6} {'A':>6}  {'Pick modelo':14} {'Resultado real':22} {'':3}"]
+    hits = total = 0
+    for (h, a, real), p in zip(FIXTURES, P):
         pH, pD, pA = float(p[2]), float(p[1]), float(p[0])
         m = max(pH, pD, pA)
         pick = h if m == pH else (a if m == pA else "Empate")
-        lines.append(f"{h + ' vs ' + a:32} {pH:8.1%} {pD:10.1%} {pA:10.1%}   -> {pick}")
+        mark = ""
+        if real is not None:
+            total += 1
+            ganador = real.split("→")[-1].strip()
+            ok = (_norm(pick) == _norm(ganador)) or (pick == "Empate" and "pen" in real)
+            hits += int(ok)
+            mark = "OK" if ok else "x"
+        lines.append(f"{h + ' vs ' + a:30} {pH:5.0%} {pD:5.0%} {pA:5.0%}  {pick:14} "
+                     f"{(real or 'pendiente'):22} {mark:3}")
+    if total:
+        lines.append(f"\nAciertos sobre los {total} ya jugados: {hits}/{total}")
     return "\n".join(lines)
 
 
@@ -83,9 +118,8 @@ def main():
     out = [__doc__.strip(), ""]
     for fname, label in [("06_xgboost", "XGBoost (campeón)"),
                          ("10_stacking", "Stacking (propuesto)")]:
-        path = C.MODELS / f"{fname}.pkl"
-        if path.exists():
-            out.append(predict_table(joblib.load(path), label, X))
+        if (C.MODELS / f"{fname}.pkl").exists():
+            out.append(predict_table(joblib.load(C.MODELS / f"{fname}.pkl"), label, X))
             out.append("")
     text = "\n".join(out)
     print(text)

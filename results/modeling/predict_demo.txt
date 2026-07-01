@@ -1,36 +1,54 @@
-Demo de inferencia: predice dieciseisavos de un Mundial con los modelos entrenados.
+Demo de inferencia: predice los dieciseisavos del Mundial 2026 con los modelos.
 
 ADVERTENCIA (fuera de distribución): los modelos se entrenaron con fútbol de CLUBES
 (ligas 2000-2025), no con selecciones. Aquí se aplica el pipeline real de inferencia
 (preprocessor.joblib + modelo) sobre vectores construidos a mano: todas las variables
 se dejan SIMÉTRICAS salvo el Elo, de modo que la predicción la gobiernan `elo_diff`
-(la variable dominante según SHAP) y el sesgo de localía aprendido. El estadio de un
-Mundial es neutral y en eliminatoria no hay empate real (penales), así que esto es un
-demo del pipeline, no un pronóstico confiable. Los Elo son aproximados y el bracket es
-ilustrativo (el real no está definido).
+(la variable dominante según SHAP) y el sesgo de localía aprendido. El "local" es solo
+el primer equipo del emparejamiento (el estadio del Mundial es neutral, así que ese
+sesgo es una distorsión conocida). En eliminatoria no hay empate real (penales). Los Elo
+son aproximados (World Football Elo, orden de magnitud). Emparejamientos reales de los
+dieciseisavos 2026 (fuentes: Wikipedia y Yahoo Sports, jul-2026). Es un demo del
+pipeline, no un pronóstico confiable.
 
 ===== XGBoost (campeón) =====
-Partido                           Local(H)  Empate(D)  Visita(A)   Predicción
-Argentina vs Australia              79.9%      13.9%       6.2%   -> Argentina
-España vs Japon                     60.7%      26.9%      12.4%   -> España
-Francia vs Senegal                  61.6%      26.0%      12.4%   -> Francia
-Brasil vs Mexico                    61.7%      26.8%      11.5%   -> Brasil
-Inglaterra vs Ecuador               60.4%      27.6%      11.9%   -> Inglaterra
-Portugal vs Suiza                   56.5%      25.7%      17.8%   -> Portugal
-Paises Bajos vs Estados Unidos      65.7%      20.2%      14.1%   -> Paises Bajos
-Alemania vs Croacia                 38.1%      33.5%      28.4%   -> Alemania
-Uruguay vs Colombia                 34.0%      31.6%      34.4%   -> Colombia
-Peru vs Marruecos                   21.1%      27.7%      51.2%   -> Marruecos
+Partido                             H      D      A  Pick modelo    Resultado real            
+Canada vs Sudafrica              50%   31%   20%  Canada         Canadá 1-0  → Canadá   OK 
+Brasil vs Japon                  66%   19%   15%  Brasil         Brasil 2-1  → Brasil   OK 
+Paraguay vs Alemania             18%   28%   55%  Alemania       1-1, 4-3 pen  → Paraguay x  
+Marruecos vs Paises Bajos        27%   29%   45%  Paises Bajos   1-1, 3-2 pen  → Marruecos x  
+Noruega vs Costa de Marfil       44%   31%   25%  Noruega        Noruega 2-1  → Noruega OK 
+Francia vs Suecia                61%   27%   12%  Francia        Francia 3-0  → Francia OK 
+Mexico vs Ecuador                32%   32%   35%  Ecuador        México 2-0  → México   x  
+Inglaterra vs RD Congo           80%   14%    6%  Inglaterra     pendiente                 
+Belgica vs Senegal               49%   31%   21%  Belgica        pendiente                 
+Estados Unidos vs Bosnia         44%   31%   25%  Estados Unidos pendiente                 
+España vs Austria                72%   16%   12%  España         pendiente                 
+Portugal vs Croacia              46%   30%   24%  Portugal       pendiente                 
+Suiza vs Argelia                 47%   30%   23%  Suiza          pendiente                 
+Australia vs Egipto              38%   34%   28%  Australia      pendiente                 
+Argentina vs Cabo Verde          82%   13%    5%  Argentina      pendiente                 
+Colombia vs Ghana                62%   24%   15%  Colombia       pendiente                 
+
+Aciertos sobre los 7 ya jugados: 4/7
 
 ===== Stacking (propuesto) =====
-Partido                           Local(H)  Empate(D)  Visita(A)   Predicción
-Argentina vs Australia              74.7%      16.9%       8.4%   -> Argentina
-España vs Japon                     68.9%      20.2%      10.9%   -> España
-Francia vs Senegal                  66.7%      21.6%      11.7%   -> Francia
-Brasil vs Mexico                    66.8%      21.7%      11.6%   -> Brasil
-Inglaterra vs Ecuador               66.1%      21.8%      12.1%   -> Inglaterra
-Portugal vs Suiza                   56.4%      27.0%      16.6%   -> Portugal
-Paises Bajos vs Estados Unidos      63.9%      22.9%      13.1%   -> Paises Bajos
-Alemania vs Croacia                 42.1%      31.8%      26.1%   -> Alemania
-Uruguay vs Colombia                 39.6%      32.8%      27.7%   -> Uruguay
-Peru vs Marruecos                   23.1%      32.2%      44.7%   -> Marruecos
+Partido                             H      D      A  Pick modelo    Resultado real            
+Canada vs Sudafrica              49%   30%   21%  Canada         Canadá 1-0  → Canadá   OK 
+Brasil vs Japon                  63%   23%   14%  Brasil         Brasil 2-1  → Brasil   OK 
+Paraguay vs Alemania             18%   29%   53%  Alemania       1-1, 4-3 pen  → Paraguay x  
+Marruecos vs Paises Bajos        29%   33%   38%  Paises Bajos   1-1, 3-2 pen  → Marruecos x  
+Noruega vs Costa de Marfil       46%   31%   23%  Noruega        Noruega 2-1  → Noruega OK 
+Francia vs Suecia                69%   20%   11%  Francia        Francia 3-0  → Francia OK 
+Mexico vs Ecuador                35%   34%   32%  Mexico         México 2-0  → México   OK 
+Inglaterra vs RD Congo           74%   18%    9%  Inglaterra     pendiente                 
+Belgica vs Senegal               53%   28%   19%  Belgica        pendiente                 
+Estados Unidos vs Bosnia         45%   32%   23%  Estados Unidos pendiente                 
+España vs Austria                72%   18%    9%  España         pendiente                 
+Portugal vs Croacia              48%   30%   22%  Portugal       pendiente                 
+Suiza vs Argelia                 48%   30%   22%  Suiza          pendiente                 
+Australia vs Egipto              40%   33%   27%  Australia      pendiente                 
+Argentina vs Cabo Verde          78%   15%    7%  Argentina      pendiente                 
+Colombia vs Ghana                60%   25%   15%  Colombia       pendiente                 
+
+Aciertos sobre los 7 ya jugados: 5/7
