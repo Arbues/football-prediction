@@ -88,29 +88,32 @@ def _row(eh, ea):
             "h2h_avg_goals": 2.5, "is_top_league": 0, "elo_missing": 0}
 
 
-def play(a, b, key=None):
-    """Devuelve (winner, sa, sb, real) para el cruce a vs b."""
-    k = key or (a, b)
-    if k in REAL:
-        w, sa, sb = REAL[k]
-        return w, sa, sb, True
-    # predicción neutral: promedio de las dos orientaciones
+def _neutral_probs(a, b):
+    """Prob. (a_gana, b_gana, empate) promediando las dos orientaciones (sede neutral)."""
     df = pd.DataFrame([_row(ELO[a], ELO[b]), _row(ELO[b], ELO[a])])[list(_PRE.feature_names_in_)]
     X = pd.DataFrame(_PRE.transform(df), columns=_FEATS)
     P = _MODEL.predict_proba(X)  # columnas [A, D, H]
-    pa = 0.5 * (P[0][2] + P[1][0])   # a gana
-    pb = 0.5 * (P[0][0] + P[1][2])   # b gana
-    w = a if pa >= pb else b
-    return w, f"{round(100 * pa)}%", f"{round(100 * pb)}%", False
+    pa = 0.5 * (P[0][2] + P[1][0])
+    pb = 0.5 * (P[0][0] + P[1][2])
+    pd_ = 0.5 * (P[0][1] + P[1][1])
+    return float(pa), float(pb), float(pd_)
+
+
+def play(a, b):
+    """Juega el cruce a vs b -> dict con probs, ganador y marcador."""
+    pa, pb, pd_ = _neutral_probs(a, b)
+    pick = a if pa >= pb else b
+    if (a, b) in REAL:
+        w, sa, sb, real = *REAL[(a, b)], True
+    else:
+        w, sa, sb, real = pick, f"{round(100 * pa)}%", f"{round(100 * pb)}%", False
+    return {"a": a, "b": b, "ea": ELO[a], "eb": ELO[b], "pa": pa, "pb": pb, "pd": pd_,
+            "w": w, "sa": sa, "sb": sb, "real": real, "pick": pick}
 
 
 def round_of(pairs):
     """Juega una lista de cruces (tuplas de codigos) -> lista de dicts resultado."""
-    res = []
-    for a, b in pairs:
-        w, sa, sb, real = play(a, b)
-        res.append({"a": a, "b": b, "sa": sa, "sb": sb, "w": w, "real": real})
-    return res
+    return [play(a, b) for a, b in pairs]
 
 
 def winners(res):
@@ -185,6 +188,72 @@ def col(matches, header, extra=""):
     return f'<div class="colwrap"><div class="hd">{header}</div><div class="col">{boxes}</div></div>'
 
 
+def explain(m):
+    """Texto que justifica el resultado del cruce a partir del Elo y las probs."""
+    a, b, w = m["a"], m["b"], m["w"]
+    na, nb, nw = NAME[a], NAME[b], NAME[w]
+    d = abs(m["ea"] - m["eb"])
+    mayor = na if m["ea"] >= m["eb"] else nb
+    fav = a if m["pa"] >= m["pb"] else b
+    nfav, favp = NAME[fav], max(m["pa"], m["pb"])
+    gap = abs(m["pa"] - m["pb"])
+    if d >= 200:
+        nivel = f"un abismo de nivel ({d} puntos Elo)"
+    elif d >= 100:
+        nivel = f"una ventaja clara ({d} puntos Elo)"
+    elif d >= 40:
+        nivel = f"una ligera ventaja ({d} puntos Elo)"
+    else:
+        nivel = f"un Elo casi idéntico (solo {d} puntos)"
+    base = f"<b>Elo:</b> {na} {m['ea']} vs {nb} {m['eb']} — {nivel} para {mayor}. "
+    if m["real"]:
+        pens = "(" in m["sa"] or "(" in m["sb"]
+        if m["pick"] == w:
+            return (base + f"<b>Resultado real</b> ({m['sa']}–{m['sb']}): el modelo favorecía a "
+                    f"{nfav} ({favp:.0%}) y así fue. Acierto.")
+        t = (base + f"<b>Resultado real</b> ({m['sa']}–{m['sb']}): sorpresa. El modelo daba "
+             f"favorito a {nfav} ({favp:.0%}), pero avanzó {nw}.")
+        if pens:
+            t += (f" En los 90' fue empate —el modelo le asignaba {m['pd']:.0%} a la igualdad— y se "
+                  f"definió por penales, que son azar puro: ningún modelo de Elo los predice.")
+        return t
+    if gap >= 0.40:
+        lect = f"victoria muy probable de {nfav} ({favp:.0%})"
+    elif gap >= 0.18:
+        lect = f"{nfav} es el favorito ({favp:.0%})"
+    else:
+        lect = f"casi un volado: {na} {m['pa']:.0%} vs {nb} {m['pb']:.0%}, se decide por décimas"
+    return (base + f"<b>Predicción:</b> {lect}. Con el resto de variables en simetría, manda la "
+            f"diferencia de Elo. Avanza {nw}.")
+
+
+def acc_item(m):
+    badge = "real" if m["real"] else "sim"
+    return (f'<details><summary>'
+            f'<span class="mt">{flag(m["a"])} {m["a"]} vs {m["b"]} {flag(m["b"])}</span>'
+            f'<span class="mr">→ {NAME[m["w"]]}</span>'
+            f'<span class="bg {badge}">{badge}</span></summary>'
+            f'<div class="exp">{explain(m)}</div></details>')
+
+
+def acc_group(title, matches):
+    return f'<div class="grp"><h3>{title}</h3>{"".join(acc_item(m) for m in matches)}</div>'
+
+
+def build_accordion(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third):
+    return (
+        '<section class="explain"><h2>Explicación de cada resultado</h2>'
+        '<p class="note">Cada acordeón detalla por qué salió ese resultado: el Elo de cada '
+        'selección, la probabilidad del modelo y la lectura. Los marcados <b>real</b> usan el '
+        'marcador oficial; los <b>sim</b>, la predicción del modelo.</p>'
+        + acc_group("16avos · Izquierda", l16) + acc_group("16avos · Derecha", r16)
+        + acc_group("8avos · Izquierda", l8) + acc_group("8avos · Derecha", r8)
+        + acc_group("4tos · Izquierda", l4) + acc_group("4tos · Derecha", r4)
+        + acc_group("Semifinales", lsemi + rsemi)
+        + acc_group("3.er puesto", third) + acc_group("FINAL", fin)
+        + '</section>')
+
+
 def build_html(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third, champ):
     center = (
         '<div class="colwrap center">'
@@ -198,6 +267,7 @@ def build_html(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third, champ):
         col(l16, "16avos") + col(l8, "8avos") + col(l4, "4tos") + col(lsemi, "Semis")
         + center
         + col(rsemi, "Semis") + col(r4, "4tos") + col(r8, "8avos") + col(r16, "16avos"))
+    acc = build_accordion(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third)
     return f"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -239,12 +309,33 @@ def build_html(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third, champ):
            border:1px solid #f2c94c; border-radius:10px; padding:14px;
            font-size:15px; line-height:1.5; }}
  .champ b {{ font-size:19px; color:#f2c94c; }}
+ .explain {{ padding:6px 22px 46px; max-width:1080px; margin:0 auto; }}
+ .explain h2 {{ color:#5fd08a; font-size:19px; }}
+ .explain .note {{ color:#8fce9f; font-size:13px; line-height:1.6; }}
+ .grp {{ margin-top:20px; }}
+ .grp h3 {{ color:#f2c94c; font-size:15px; border-bottom:1px solid #1c4c3a;
+            padding-bottom:6px; margin-bottom:8px; }}
+ details {{ background:#0f3a2c; border:1px solid #1c4c3a; border-radius:8px; margin:7px 0; }}
+ summary {{ cursor:pointer; padding:10px 12px; display:flex; align-items:center; gap:10px;
+            list-style:none; font-size:14px; }}
+ summary::-webkit-details-marker {{ display:none; }}
+ summary::before {{ content:"\\25B8"; color:#5fd08a; }}
+ details[open] summary::before {{ content:"\\25BE"; }}
+ details[open] {{ border-color:#2e6b4f; }}
+ .mt {{ font-weight:600; letter-spacing:.3px; }}
+ .mr {{ color:#bfe9cf; }}
+ .bg {{ margin-left:auto; font-size:11px; padding:2px 8px; border-radius:10px; }}
+ .bg.real {{ background:#155e3f; color:#fff; }}
+ .bg.sim {{ background:#243b32; color:#8fce9f; }}
+ .exp {{ padding:0 14px 12px 32px; color:#cfe6d8; font-size:13px; line-height:1.65; }}
+ .exp b {{ color:#eaf6ee; }}
 </style></head>
 <body>
 <header><h1>Fase Eliminatoria — Mundial 2026</h1>
 <span class="sub">Simulación con el modelo <b>Stacking</b> · 7 partidos con resultado real,
 resto predicho (números = prob. de ganar) · demo fuera de distribución</span></header>
 <div class="bracket">{body}</div>
+{acc}
 </body></html>"""
 
 
