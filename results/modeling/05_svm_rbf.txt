@@ -1,0 +1,30 @@
+MODELO: SVC kernel RBF (submuestra estratificada temporal)
+submuestra de entrenamiento: 35000 filas (de 191099)
+best_params (Randomized, TimeSeriesSplit K=3): {'gamma': 0.001, 'C': 100}
+CV f1_macro: 0.4080
+class_weight='balanced'; probability=True para ROC/log-loss
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.5862    0.4469    0.5072     10827
+           D     0.3010    0.3264    0.3132      6453
+           A     0.3998    0.5095    0.4480      7389
+
+    accuracy                         0.4341     24669
+   macro avg     0.4290    0.4276    0.4228     24669
+weighted avg     0.4558    0.4341    0.4387     24669
+
+
+accuracy           : 0.4341
+f1_macro           : 0.4228
+f1_weighted        : 0.4387
+cohen_kappa        : 0.1486
+roc_auc_ovr_macro  : 0.6148
+log_loss           : 1.0311
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    4839    2816    3172
+     D    1866    2106    2481
+     A    1550    2074    3765

@@ -1,0 +1,38 @@
+MODELO: LogisticRegression multinomial (softmax), penalty=L2
+C elegido por CV TimeSeriesSplit: 3.162
+CV f1_macro en el óptimo: 0.4130
+class_weight='balanced', solver='lbfgs', max_iter=2000
+
+Barrido (C -> CV f1_macro):
+      0.01 -> 0.4100
+   0.03162 -> 0.4118
+       0.1 -> 0.4127
+    0.3162 -> 0.4130
+         1 -> 0.4127
+     3.162 -> 0.4130
+        10 -> 0.4125
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.5689    0.5009    0.5327     10827
+           D     0.3062    0.2219    0.2573      6453
+           A     0.4016    0.5684    0.4706      7389
+
+    accuracy                         0.4481     24669
+   macro avg     0.4255    0.4304    0.4202     24669
+weighted avg     0.4500    0.4481    0.4421     24669
+
+
+accuracy           : 0.4481
+f1_macro           : 0.4202
+f1_weighted        : 0.4421
+cohen_kappa        : 0.1559
+roc_auc_ovr_macro  : 0.6134
+log_loss           : 1.0539
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    5423    1924    3480
+     D    2242    1432    2779
+     A    1868    1321    4200

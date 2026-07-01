@@ -1,0 +1,30 @@
+MODELO: XGBoost (multi:softprob, tree_method=hist, device=cuda)
+best_params (Randomized, TimeSeriesSplit): {'colsample_bytree': np.float64(0.923), 'learning_rate': np.float64(0.2709), 'max_depth': 8, 'min_child_weight': 1, 'reg_lambda': np.float64(1.3607), 'subsample': np.float64(0.8591)}
+CV f1_macro: 0.3743
+n_estimators final por early_stopping (val): 13
+desbalance: sample_weight='balanced'
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.5662    0.5078    0.5354     10827
+           D     0.3000    0.2379    0.2654      6453
+           A     0.4106    0.5469    0.4690      7389
+
+    accuracy                         0.4489     24669
+   macro avg     0.4256    0.4309    0.4233     24669
+weighted avg     0.4500    0.4489    0.4449     24669
+
+
+accuracy           : 0.4489
+f1_macro           : 0.4233
+f1_weighted        : 0.4449
+cohen_kappa        : 0.1567
+roc_auc_ovr_macro  : 0.6142
+log_loss           : 1.0510
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    5498    2154    3175
+     D    2292    1535    2626
+     A    1921    1427    4041

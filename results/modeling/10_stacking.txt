@@ -1,0 +1,29 @@
+MODELO: Stacking (meta-modelo = LogReg sobre proba OOF de las bases)
+bases: LogReg, RandomForest, XGBoost (reconstruidas, OOF honesto)
+OOF interno StratifiedKFold(5); temporalidad garantizada en val/test
+meta con class_weight='balanced'
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.5777    0.4874    0.5287     10827
+           D     0.2980    0.2763    0.2867      6453
+           A     0.4143    0.5355    0.4672      7389
+
+    accuracy                         0.4466     24669
+   macro avg     0.4300    0.4331    0.4275     24669
+weighted avg     0.4556    0.4466    0.4470     24669
+
+
+accuracy           : 0.4466
+f1_macro           : 0.4275
+f1_weighted        : 0.4470
+cohen_kappa        : 0.1590
+roc_auc_ovr_macro  : 0.6176
+log_loss           : 1.0507
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    5277    2513    3037
+     D    2114    1783    2556
+     A    1744    1688    3957

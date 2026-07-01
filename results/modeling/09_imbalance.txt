@@ -1,0 +1,10 @@
+EXPERIMENTO DE DESBALANCE — XGBoost con configuración fija:
+  {'objective': 'multi:softprob', 'num_class': 3, 'eval_metric': 'mlogloss', 'tree_method': 'hist', 'device': 'cuda', 'n_estimators': 400, 'max_depth': 6, 'learning_rate': 0.05, 'subsample': 0.9, 'colsample_bytree': 0.9, 'reg_lambda': 1.0, 'random_state': 42, 'n_jobs': -1}
+
+Estrategia      f1_macro   recall_D   recall_H   recall_A   accuracy
+  sin_balanceo  0.3482    0.0079     0.8528     0.3599     0.4841
+  class_weight  0.4247    0.2428     0.5049     0.5485     0.4494
+  SMOTE         0.3563    0.0163     0.8315     0.3827     0.4838
+
+Lectura: el balanceo se juega en recall_D (empate) vs accuracy global.
+SMOTE interpola sobre one-hot (limitación conocida, reportada).

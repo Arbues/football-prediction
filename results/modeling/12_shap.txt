@@ -1,0 +1,21 @@
+INTERPRETABILIDAD SHAP — campeón XGBoost (muestra de test)
+TreeExplainer; n=2500
+
+Importancia global (media |SHAP| agregada sobre H/D/A), top 15:
+  elo_diff               0.1418
+  h2h_home_winrate       0.0241
+  ga5_diff               0.0225
+  form5_diff             0.0187
+  gf5_diff               0.0177
+  HomeElo                0.0176
+  h2h_played             0.0162
+  elo_missing            0.0137
+  AwayElo                0.0112
+  away_gf5               0.0099
+  away_ga5               0.0098
+  home_ga5               0.0094
+  h2h_avg_goals          0.0087
+  home_gf5               0.0078
+  form3_diff             0.0071
+
+Figuras: figures/modeling/shap_importance.png, shap_summary_D.png

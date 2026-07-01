@@ -1,0 +1,28 @@
+MODELO: Soft-Voting (promedio de probabilidades)
+bases congeladas (FrozenEstimator): LogReg, RandomForest, XGBoost
+sin refit de las bases -> sin fuga; el voting no aprende pesos
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.5668    0.5225    0.5438     10827
+           D     0.3059    0.2095    0.2487      6453
+           A     0.4074    0.5662    0.4739      7389
+
+    accuracy                         0.4537     24669
+   macro avg     0.4267    0.4328    0.4221     24669
+weighted avg     0.4508    0.4537    0.4456     24669
+
+
+accuracy           : 0.4537
+f1_macro           : 0.4221
+f1_weighted        : 0.4456
+cohen_kappa        : 0.1607
+roc_auc_ovr_macro  : 0.6180
+log_loss           : 1.0492
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    5657    1833    3337
+     D    2353    1352    2748
+     A    1970    1235    4184

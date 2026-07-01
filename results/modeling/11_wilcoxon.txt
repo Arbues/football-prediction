@@ -1,0 +1,7 @@
+PRUEBA DE WILCOXON (rangos con signo, alpha=0.05)
+Propuesto: Stacking
+Unidad de pareo: f1_macro por bloque mensual en test (n=17 bloques)
+f1_macro medio del propuesto por bloque: 0.4183
+
+vs Dummy       : media_propuesto=0.4183 media_base=0.2023  Δ=+0.2159  W=153.0  p=7.63e-06  -> supera: SÍ (significativo)
+vs GaussianNB  : media_propuesto=0.4183 media_base=0.3907  Δ=+0.0276  W=140.0  p=6.71e-04  -> supera: SÍ (significativo)

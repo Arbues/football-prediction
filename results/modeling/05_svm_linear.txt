@@ -1,0 +1,35 @@
+MODELO: LinearSVC (contraste lineal) + calibración sigmoide
+C elegido por CV TimeSeriesSplit: 10.0
+CV f1_macro en el óptimo: 0.3925
+train completo (191099); class_weight='balanced'
+
+Barrido (C -> CV f1_macro):
+    0.01 -> 0.3908
+     0.1 -> 0.3923
+     1.0 -> 0.3925
+    10.0 -> 0.3925
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.4843    0.8691    0.6220     10827
+           D     0.3417    0.0064    0.0125      6453
+           A     0.4619    0.3199    0.3780      7389
+
+    accuracy                         0.4789     24669
+   macro avg     0.4293    0.3985    0.3375     24669
+weighted avg     0.4403    0.4789    0.3895     24669
+
+
+accuracy           : 0.4789
+f1_macro           : 0.3375
+f1_weighted        : 0.3895
+cohen_kappa        : 0.1182
+roc_auc_ovr_macro  : 0.6148
+log_loss           : 1.0299
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H    9410      32    1385
+     D    5043      41    1369
+     A    4978      47    2364

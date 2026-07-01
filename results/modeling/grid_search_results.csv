@@ -1,0 +1,14 @@
+model,family,best_params,cv_f1_macro,val_f1_macro,val_accuracy,val_recall_D,fit_seconds
+Dummy,baseline,strategy=most_frequent,,0.2033468559837728,0.4388909157241882,0.0,0.01
+GaussianNB,baseline,var_smoothing=1.00e-03,0.3983,0.4039734032148723,0.4236491142729742,0.2541453587478692,0.25
+LogReg,lineal,"C=3.162, penalty=l2, class_weight=balanced",0.413,0.4202249060887236,0.4481332846892861,0.2219122888578955,6.85
+DecisionTree,arbol,"{'criterion': 'entropy', 'max_depth': 8, 'min_samples_leaf': 200}",0.4029,0.4032487494267728,0.4347561717134865,0.1889043855571052,44.09
+XGBoost,boosting-gpu,"{'colsample_bytree': np.float64(0.923), 'learning_rate': np.float64(0.2709), 'max_depth': 8, 'min_child_weight': 1, 'reg_lambda': np.float64(1.3607), 'subsample': np.float64(0.8591)}, n_est=13",0.3743,0.4232668320065467,0.4489034821030443,0.237873857120719,460.1
+RandomForest,ensemble-bagging,"{'max_depth': 12, 'max_features': 0.3, 'min_samples_leaf': 5, 'n_estimators': 300}",0.412,0.4199369605412198,0.4534435931736187,0.2006818534015186,760.86
+CatBoost,boosting-gpu,"{'depth': 8, 'l2_leaf_reg': np.float64(5.0545), 'learning_rate': np.float64(0.0237)}, iters=405",0.4132,0.4207917290558006,0.4528760792897969,0.2051758871842554,1432.9
+AdaBoost,ensemble-boosting,"{'learning_rate': 0.1, 'n_estimators': 100}",0.388,0.3968206613484573,0.4081640925858364,0.2877731287773128,329.06
+LightGBM,boosting-gpu,"{'colsample_bytree': np.float64(0.9209), 'learning_rate': np.float64(0.0409), 'min_child_samples': 80, 'num_leaves': 23, 'reg_lambda': np.float64(3.8612), 'subsample': np.float64(0.6795)}, n_est=127",0.4116,0.4244736749501179,0.4533219830556569,0.2219122888578955,1278.69
+SVM-RBF,svm,"{'gamma': 0.001, 'C': 100}",0.408,0.4227967615885868,0.4341481211236775,0.3263598326359833,1742.79
+SVM-Linear,svm,C=10.0,0.3925,0.3374959501412822,0.4789411812396125,0.0063536339686967,13.22
+Voting,ensemble-final,"soft; bases=LogReg,RF,XGB",,0.4221138596709846,0.4537273501155296,0.2095149542848287,0.01
+Stacking,ensemble-final,"meta=LogReg; bases=LogReg,RF,XGB; inner_cv=SKF5",,0.42754516313582425,0.4465928898617698,0.2763055942972261,159.85

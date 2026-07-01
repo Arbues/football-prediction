@@ -1,0 +1,27 @@
+MODELO: DummyClassifier(strategy='most_frequent')
+Predice siempre la clase mayoritaria (H). Piso trivial.
+
+== Validación (val 2022-2023) ==
+              precision    recall  f1-score   support
+
+           H     0.4389    1.0000    0.6100     10827
+           D     0.0000    0.0000    0.0000      6453
+           A     0.0000    0.0000    0.0000      7389
+
+    accuracy                         0.4389     24669
+   macro avg     0.1463    0.3333    0.2033     24669
+weighted avg     0.1926    0.4389    0.2677     24669
+
+
+accuracy           : 0.4389
+f1_macro           : 0.2033
+f1_weighted        : 0.2677
+cohen_kappa        : 0.0000
+roc_auc_ovr_macro  : 0.5000
+log_loss           : 20.2244
+
+matriz de confusion (filas=verdad, cols=pred; orden H,D,A):
+             H       D       A
+     H   10827       0       0
+     D    6453       0       0
+     A    7389       0       0
