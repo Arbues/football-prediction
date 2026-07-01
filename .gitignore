@@ -38,3 +38,6 @@ Thumbs.db
 .venv/
 venv/
 env/
+
+# CatBoost training artifacts
+catboost_info/
