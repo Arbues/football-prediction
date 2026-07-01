@@ -41,3 +41,12 @@ env/
 
 # CatBoost training artifacts
 catboost_info/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+missfont.log
