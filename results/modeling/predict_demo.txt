@@ -1,0 +1,36 @@
+Demo de inferencia: predice dieciseisavos de un Mundial con los modelos entrenados.
+
+ADVERTENCIA (fuera de distribución): los modelos se entrenaron con fútbol de CLUBES
+(ligas 2000-2025), no con selecciones. Aquí se aplica el pipeline real de inferencia
+(preprocessor.joblib + modelo) sobre vectores construidos a mano: todas las variables
+se dejan SIMÉTRICAS salvo el Elo, de modo que la predicción la gobiernan `elo_diff`
+(la variable dominante según SHAP) y el sesgo de localía aprendido. El estadio de un
+Mundial es neutral y en eliminatoria no hay empate real (penales), así que esto es un
+demo del pipeline, no un pronóstico confiable. Los Elo son aproximados y el bracket es
+ilustrativo (el real no está definido).
+
+===== XGBoost (campeón) =====
+Partido                           Local(H)  Empate(D)  Visita(A)   Predicción
+Argentina vs Australia              79.9%      13.9%       6.2%   -> Argentina
+España vs Japon                     60.7%      26.9%      12.4%   -> España
+Francia vs Senegal                  61.6%      26.0%      12.4%   -> Francia
+Brasil vs Mexico                    61.7%      26.8%      11.5%   -> Brasil
+Inglaterra vs Ecuador               60.4%      27.6%      11.9%   -> Inglaterra
+Portugal vs Suiza                   56.5%      25.7%      17.8%   -> Portugal
+Paises Bajos vs Estados Unidos      65.7%      20.2%      14.1%   -> Paises Bajos
+Alemania vs Croacia                 38.1%      33.5%      28.4%   -> Alemania
+Uruguay vs Colombia                 34.0%      31.6%      34.4%   -> Colombia
+Peru vs Marruecos                   21.1%      27.7%      51.2%   -> Marruecos
+
+===== Stacking (propuesto) =====
+Partido                           Local(H)  Empate(D)  Visita(A)   Predicción
+Argentina vs Australia              74.7%      16.9%       8.4%   -> Argentina
+España vs Japon                     68.9%      20.2%      10.9%   -> España
+Francia vs Senegal                  66.7%      21.6%      11.7%   -> Francia
+Brasil vs Mexico                    66.8%      21.7%      11.6%   -> Brasil
+Inglaterra vs Ecuador               66.1%      21.8%      12.1%   -> Inglaterra
+Portugal vs Suiza                   56.4%      27.0%      16.6%   -> Portugal
+Paises Bajos vs Estados Unidos      63.9%      22.9%      13.1%   -> Paises Bajos
+Alemania vs Croacia                 42.1%      31.8%      26.1%   -> Alemania
+Uruguay vs Colombia                 39.6%      32.8%      27.7%   -> Uruguay
+Peru vs Marruecos                   23.1%      32.2%      44.7%   -> Marruecos
