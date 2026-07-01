@@ -1,0 +1,30 @@
+======================================================================
+EDA 07 - FEATURES vs RESULTADO (FTResult)
+======================================================================
+MEDIA de cada feature por clase (H=local, D=empate, A=visita):
+          HomeElo  AwayElo  elo_diff  Form5Home  Form5Away  form5_diff  OddHome  OddDraw  OddAway
+FTResult                                                                                         
+H         1556.70  1514.09     44.00       7.15       6.51        0.64     2.10     3.75     4.80
+D         1522.64  1532.77     -9.87       6.60       7.01       -0.41     2.44     3.47     3.71
+A         1504.93  1563.68    -61.33       6.17       7.50       -1.32     3.03     3.52     3.10
+
+MEDIANA de cada feature por clase:
+          HomeElo  AwayElo  elo_diff  Form5Home  Form5Away  form5_diff  OddHome  OddDraw  OddAway
+FTResult                                                                                         
+H         1537.80  1498.31     34.77        7.0        6.0         1.0     1.95     3.45     3.80
+D         1505.64  1516.49     -7.96        7.0        7.0         0.0     2.20     3.36     3.25
+A         1489.35  1543.48    -49.42        6.0        7.0        -1.0     2.49     3.40     2.80
+
+----------------------------------------------------------------------
+SEPARACION DE CLASES (senal pre-partido)
+----------------------------------------------------------------------
+elo_diff   : H=+44.00  D=-9.87  A=-61.33
+form5_diff : H=+0.64  D=-0.41  A=-1.32
+OddHome    : H=+2.10  D=+2.44  A=+3.03
+
+Lectura: elo_diff y form5_diff decrecen monotonamente H > D > A: cuando el
+local es mas fuerte, gana; cuando el visitante lo es, gana la visita. El empate
+(D) queda en el MEDIO con diferencias ~0 -> por eso es la clase mas dificil de
+separar. OddHome sube de H a A (mas cuota al local = menos probable que gane).
+
+[figuras] elo_by_result.png, form_by_result.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures

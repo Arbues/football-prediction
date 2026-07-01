@@ -1,0 +1,86 @@
+======================================================================
+EDA 00 - VISION GENERAL
+======================================================================
+Origen: Kaggle 'adamgbor/club-football-match-data-2000-2025' (publico)
+Archivo Matches: Matches.csv  (43.86 MB en disco)
+Archivo Elo:     EloRatings.csv  (9.88 MB en disco)
+
+Matches:  N = 230,557 instancias   D = 48 caracteristicas
+          memoria en RAM (deep): 147.9 MB
+Elo:      245,033 filas x 4 columnas
+
+Rango temporal MatchDate: 2000-07-28 -> 2025-06-01
+Divisiones (ligas) unicas: 38
+Equipos locales unicos:    1214
+
+----------------------------------------------------------------------
+DICCIONARIO DE VARIABLES (tipo, %no-nulo, #unicos, grupo)
+----------------------------------------------------------------------
+ #  columna       dtype        %no-nulo  #unicos  grupo
+ 0  Division      str            100.0%       38  CONTEXTO
+ 1  MatchDate     datetime64[us]   100.0%    7,402  CONTEXTO
+ 2  MatchTime     str             43.0%      195  CONTEXTO
+ 3  HomeTeam      str            100.0%    1,214  CONTEXTO
+ 4  AwayTeam      str            100.0%    1,206  CONTEXTO
+ 5  HomeElo       float64         61.4%   50,547  PRE_SEGURA
+ 6  AwayElo       float64         61.4%   50,563  PRE_SEGURA
+ 7  Form3Home     float64         99.3%        9  PRE_SEGURA
+ 8  Form5Home     float64         99.3%       15  PRE_SEGURA
+ 9  Form3Away     float64         99.3%        9  PRE_SEGURA
+10  Form5Away     float64         99.3%       15  PRE_SEGURA
+11  FTHome        float64        100.0%       11  LEAKAGE_POST
+12  FTAway        float64        100.0%       11  LEAKAGE_POST
+13  FTResult      str            100.0%        3  TARGET
+14  HTHome        float64         76.3%        8  LEAKAGE_POST
+15  HTAway        float64         76.3%        8  LEAKAGE_POST
+16  HTResult      str             76.3%        3  LEAKAGE_POST
+17  HomeShots     float64         49.8%       46  LEAKAGE_POST
+18  AwayShots     float64         49.8%       40  LEAKAGE_POST
+19  HomeTarget    float64         49.4%       27  LEAKAGE_POST
+20  AwayTarget    float64         49.4%       23  LEAKAGE_POST
+21  HomeFouls     float64         49.4%       42  LEAKAGE_POST
+22  AwayFouls     float64         49.4%       41  LEAKAGE_POST
+23  HomeCorners   float64         49.6%       26  LEAKAGE_POST
+24  AwayCorners   float64         49.6%       23  LEAKAGE_POST
+25  HomeYellow    float64         51.7%       12  LEAKAGE_POST
+26  AwayYellow    float64         51.7%       11  LEAKAGE_POST
+27  HomeRed       float64         51.7%        4  LEAKAGE_POST
+28  AwayRed       float64         51.7%        6  LEAKAGE_POST
+29  OddHome       float64         98.7%    1,267  ODDS_MERCADO
+30  OddDraw       float64         98.7%      955  ODDS_MERCADO
+31  OddAway       float64         98.7%    2,012  ODDS_MERCADO
+32  MaxHome       float64         88.0%    1,199  ODDS_MERCADO
+33  MaxDraw       float64         88.0%    1,041  ODDS_MERCADO
+34  MaxAway       float64         88.0%    1,939  ODDS_MERCADO
+35  Over25        float64         64.4%      231  ODDS_MERCADO
+36  Under25       float64         64.4%      391  ODDS_MERCADO
+37  MaxOver25     float64         64.4%      240  ODDS_MERCADO
+38  MaxUnder25    float64         64.4%      337  ODDS_MERCADO
+39  HandiSize     float64         68.0%       35  ODDS_MERCADO
+40  HandiHome     float64         67.9%      434  ODDS_MERCADO
+41  HandiAway     float64         67.9%      646  ODDS_MERCADO
+42  C_LTH         float64         48.8%    9,109  CIERRE_BOOKMAKER
+43  C_LTA         float64         48.8%    9,122  CIERRE_BOOKMAKER
+44  C_VHD         float64         48.8%    8,939  CIERRE_BOOKMAKER
+45  C_VAD         float64         48.8%    8,693  CIERRE_BOOKMAKER
+46  C_HTB         float64         48.8%    8,826  CIERRE_BOOKMAKER
+47  C_PHB         float64         48.8%    8,658  CIERRE_BOOKMAKER
+
+----------------------------------------------------------------------
+RESUMEN POR GRUPO (taxonomia anti-leakage)
+----------------------------------------------------------------------
+TARGET             ( 1): FTResult
+PRE_SEGURA         ( 6): HomeElo, AwayElo, Form3Home, Form5Home, Form3Away, Form5Away
+ODDS_MERCADO       (13): OddHome, OddDraw, OddAway, MaxHome, MaxDraw, MaxAway, Over25, Under25, MaxOver25, MaxUnder25, HandiSize, HandiHome, HandiAway
+CONTEXTO           ( 5): Division, MatchDate, MatchTime, HomeTeam, AwayTeam
+CIERRE_BOOKMAKER   ( 6): C_LTH, C_LTA, C_VHD, C_VAD, C_HTB, C_PHB
+LEAKAGE_POST       (17): FTHome, FTAway, HTHome, HTAway, HTResult, HomeShots, AwayShots, HomeTarget, AwayTarget, HomeFouls, AwayFouls, HomeCorners, AwayCorners, HomeYellow, AwayYellow, HomeRed, AwayRed
+SIN_CLASIFICAR     ( 0): -
+
+[chequeo] columnas sin clasificar: 0 -> ninguna (OK)
+
+primeras 3 filas (columnas de contexto + target):
+  Division  MatchDate MatchTime   HomeTeam    AwayTeam  HomeElo  AwayElo  Form3Home  Form5Home  Form3Away  Form5Away FTResult
+0       F1 2000-07-28       NaN  Marseille      Troyes  1686.34  1586.57        0.0        0.0        0.0        0.0        H
+1       F1 2000-07-28       NaN   Paris SG  Strasbourg  1714.89  1642.51        0.0        0.0        0.0        0.0        H
+2       F2 2000-07-28       NaN  Wasquehal       Nancy  1465.08  1633.80        0.0        0.0        0.0        0.0        A

@@ -1,0 +1,97 @@
+======================================================================
+EDA 01 - VALORES FALTANTES
+======================================================================
+N = 230,557 filas   celdas totales = 11,066,736
+Celdas nulas totales: 3,205,083 (28.96% del dataset)
+
+% NULOS POR COLUMNA (desc):
+columna          n_nulos      pct  grupo
+MatchTime        131,485   57.03%  CONTEXTO
+C_LTA            117,955   51.16%  CIERRE_BOOKMAKER
+C_VHD            117,955   51.16%  CIERRE_BOOKMAKER
+C_VAD            117,955   51.16%  CIERRE_BOOKMAKER
+C_LTH            117,955   51.16%  CIERRE_BOOKMAKER
+C_HTB            117,955   51.16%  CIERRE_BOOKMAKER
+C_PHB            117,955   51.16%  CIERRE_BOOKMAKER
+HomeTarget       116,628   50.59%  LEAKAGE_POST
+AwayTarget       116,625   50.58%  LEAKAGE_POST
+HomeFouls        116,584   50.57%  LEAKAGE_POST
+AwayFouls        116,584   50.57%  LEAKAGE_POST
+HomeCorners      116,194   50.40%  LEAKAGE_POST
+AwayCorners      116,194   50.40%  LEAKAGE_POST
+HomeShots        115,822   50.24%  LEAKAGE_POST
+AwayShots        115,819   50.23%  LEAKAGE_POST
+AwayRed          111,260   48.26%  LEAKAGE_POST
+HomeRed          111,258   48.26%  LEAKAGE_POST
+AwayYellow       111,258   48.26%  LEAKAGE_POST
+HomeYellow       111,259   48.26%  LEAKAGE_POST
+AwayElo           89,029   38.61%  PRE_SEGURA
+HomeElo           88,960   38.58%  PRE_SEGURA
+Under25           82,160   35.64%  ODDS_MERCADO
+Over25            82,159   35.64%  ODDS_MERCADO
+MaxUnder25        82,160   35.64%  ODDS_MERCADO
+MaxOver25         82,159   35.64%  ODDS_MERCADO
+HandiAway         74,106   32.14%  ODDS_MERCADO
+HandiHome         74,082   32.13%  ODDS_MERCADO
+HandiSize         73,824   32.02%  ODDS_MERCADO
+HTHome            54,580   23.67%  LEAKAGE_POST
+HTResult          54,580   23.67%  LEAKAGE_POST
+HTAway            54,580   23.67%  LEAKAGE_POST
+MaxAway           27,635   11.99%  ODDS_MERCADO
+MaxHome           27,635   11.99%  ODDS_MERCADO
+MaxDraw           27,635   11.99%  ODDS_MERCADO
+OddHome            3,030    1.31%  ODDS_MERCADO
+OddAway            3,030    1.31%  ODDS_MERCADO
+OddDraw            3,030    1.31%  ODDS_MERCADO
+Form3Home          1,500    0.65%  PRE_SEGURA
+Form5Home          1,500    0.65%  PRE_SEGURA
+Form3Away          1,500    0.65%  PRE_SEGURA
+Form5Away          1,500    0.65%  PRE_SEGURA
+FTAway                 3    0.00%  LEAKAGE_POST
+FTHome                 3    0.00%  LEAKAGE_POST
+FTResult               3    0.00%  TARGET
+HomeTeam               0    0.00%  CONTEXTO
+MatchDate              0    0.00%  CONTEXTO
+Division               0    0.00%  CONTEXTO
+AwayTeam               0    0.00%  CONTEXTO
+
+----------------------------------------------------------------------
+UMBRALES DE DECISION
+----------------------------------------------------------------------
+>50% nulos (candidatas a descarte): 15 -> ['MatchTime', 'C_LTA', 'C_VHD', 'C_VAD', 'C_LTH', 'C_HTB', 'C_PHB', 'HomeTarget', 'AwayTarget', 'HomeFouls', 'AwayFouls', 'HomeCorners', 'AwayCorners', 'HomeShots', 'AwayShots']
+20-50% nulos (imputacion cuidadosa): 16 -> ['AwayRed', 'HomeRed', 'AwayYellow', 'HomeYellow', 'AwayElo', 'HomeElo', 'Under25', 'Over25', 'MaxUnder25', 'MaxOver25', 'HandiAway', 'HandiHome', 'HandiSize', 'HTHome', 'HTResult', 'HTAway']
+<5% nulos (imputacion trivial):     14 -> ['OddHome', 'OddAway', 'OddDraw', 'Form3Home', 'Form5Home', 'Form3Away', 'Form5Away', 'FTAway', 'FTHome', 'FTResult', 'HomeTeam', 'MatchDate', 'Division', 'AwayTeam']
+
+[target] filas con FTResult nulo: 3 (se descartan: no hay etiqueta)
+
+----------------------------------------------------------------------
+NULOS DE HomeElo POR ANIO (confirma disponibilidad temporal)
+----------------------------------------------------------------------
+  2000:  10.1% nulo  ###
+  2001:  18.9% nulo  ######
+  2002:  25.4% nulo  ########
+  2003:  23.5% nulo  #######
+  2004:  25.2% nulo  ########
+  2005:  23.1% nulo  #######
+  2006:  24.4% nulo  ########
+  2007:  24.4% nulo  ########
+  2008:  23.6% nulo  #######
+  2009:  23.4% nulo  #######
+  2010:  22.4% nulo  #######
+  2011:  27.9% nulo  #########
+  2012:  42.5% nulo  ##############
+  2013:  44.8% nulo  ##############
+  2014:  45.8% nulo  ###############
+  2015:  46.1% nulo  ###############
+  2016:  46.3% nulo  ###############
+  2017:  46.5% nulo  ###############
+  2018:  47.4% nulo  ###############
+  2019:  46.7% nulo  ###############
+  2020:  42.2% nulo  ##############
+  2021:  46.1% nulo  ###############
+  2022:  49.3% nulo  ################
+  2023:  48.6% nulo  ################
+  2024:  46.9% nulo  ###############
+  2025:  23.1% nulo  #######
+
+[figura] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures/missingness_bar.png

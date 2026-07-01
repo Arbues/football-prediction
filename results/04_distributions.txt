@@ -1,0 +1,24 @@
+======================================================================
+EDA 04 - DISTRIBUCIONES
+======================================================================
+FTHome       n=230,554  media=   1.49  std=   1.26  skew=  0.93  kurt=  1.07
+FTAway       n=230,554  media=   1.15  std=   1.11  skew=  1.06  kurt=  1.38
+HomeElo      n=141,597  media=1533.12  std= 153.28  skew=  0.43  kurt=  0.12
+AwayElo      n=141,528  media=1533.17  std= 153.29  skew=  0.43  kurt=  0.12
+elo_diff     n=132,413  media=   0.01  std= 132.91  skew=  0.00  kurt=  0.85
+Form3Home    n=229,057  media=   3.98  std=   2.38  skew=  0.23  kurt= -0.63
+Form3Away    n=229,057  media=   4.20  std=   2.39  skew=  0.15  kurt= -0.67
+Form5Home    n=229,057  media=   6.72  std=   3.26  skew=  0.20  kurt= -0.40
+Form5Away    n=229,057  media=   6.93  std=   3.27  skew=  0.16  kurt= -0.42
+
+----------------------------------------------------------------------
+LECTURAS
+----------------------------------------------------------------------
+- Goles: asimetria positiva (cola larga a la derecha), tipico Poisson-like;
+  moda en 1 gol local. FTHome > FTAway confirma ventaja de localia.
+- Elo: aprox. normal, ligera asimetria positiva (skew ~0.43), centrado ~1533.
+- elo_diff: simetrica y centrada en 0 (mean 0.01) -> Elo no sesga por sede.
+- Form: discreta (0..9 y 0..15), casi uniforme con leve carga a valores medios;
+  son puntos en ultimos 3/5 partidos, disponibles ANTES del partido.
+
+[figuras] dist_goals.png, dist_elo.png, dist_elo_diff.png, dist_form.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures

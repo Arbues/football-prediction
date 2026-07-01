@@ -1,0 +1,45 @@
+======================================================================
+EDA 06 - OUTLIERS (regla IQR: fuera de [Q1-1.5IQR, Q3+1.5IQR])
+======================================================================
+
+[Elo y forma]
+columna             Q1        Q3    lim_inf    lim_sup  #outliers    %out
+HomeElo        1424.87   1634.24    1110.81    1948.30      1,227   0.87%
+AwayElo        1424.93   1634.22    1110.99    1948.16      1,221   0.86%
+elo_diff        -76.67     76.40    -306.27     306.00      4,982   3.76%
+Form5Home         4.00      9.00      -3.50      16.50          0   0.00%
+Form5Away         4.00      9.00      -3.50      16.50          0   0.00%
+
+[Cuotas de mercado]
+columna             Q1        Q3    lim_inf    lim_sup  #outliers    %out
+OddHome           1.75      2.68       0.35       4.08     15,514   6.82%
+OddDraw           3.21      3.71       2.46       4.46     20,415   8.97%
+OddAway           2.60      4.50      -0.25       7.35     17,280   7.59%
+Over25            1.75      2.12       1.19       2.68      1,414   0.95%
+Under25           1.67      2.02       1.14       2.54      5,999   4.04%
+HandiSize        -0.50      0.00      -1.25       0.75     21,009  13.40%
+HandiHome         1.83      2.01       1.56       2.28      7,367   4.71%
+HandiAway         1.83      2.02       1.55       2.30      6,956   4.45%
+MaxOver25         1.83      2.25       1.20       2.88      1,090   0.73%
+MaxUnder25        1.75      2.12       1.19       2.68      6,448   4.35%
+
+[Goles (contexto)]
+columna             Q1        Q3    lim_inf    lim_sup  #outliers    %out
+FTHome            1.00      2.00      -0.50       3.50     15,992   6.94%
+FTAway            0.00      2.00      -3.00       5.00        545   0.24%
+
+----------------------------------------------------------------------
+VALORES SOSPECHOSOS (centinela / imposibles en cuotas)
+----------------------------------------------------------------------
+HandiSize == -99.90 (centinela de faltante): 2 filas
+OddHome == 0 (cuota imposible): 7 filas
+MaxAway == 0 (cuota imposible): 1 filas
+MaxOver25: max = 172.0  (colas extremas -> errores de captura)
+MaxUnder25: max = 238.0  (colas extremas -> errores de captura)
+HandiHome: max = 177.0  (colas extremas -> errores de captura)
+MaxAway: max = 301.0  (colas extremas -> errores de captura)
+Lectura: una cuota no puede ser 0 ni 172; son errores/centinelas a limpiar
+o winsorizar en preprocesamiento. Elo/Form NO tienen valores imposibles;
+sus 'outliers' IQR son extremos legitimos (equipos muy fuertes/debiles).
+
+[figuras] boxplots_outliers.png, boxplots_odds.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures

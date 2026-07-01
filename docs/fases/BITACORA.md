@@ -4,6 +4,36 @@
 
 ---
 
+## [2026-07-01 ~00:35] — Arbués — Fase 1 (EDA) en scripts `src/eda/`
+
+**Qué hice:**
+- Descargué el dataset a `data/raw/` (`Matches.csv`, `EloRatings.csv`) vía el endpoint público de Kaggle con `curl` (kagglehub quedó con install roto: falta `kagglesdk.competitions.legacy`; el endpoint directo `api/v1/datasets/download/...` funciona sin credenciales).
+- Construí el EDA como **9 scripts `.py` numerados y autónomos** en `src/eda/` (no notebook aún, por decisión del equipo). Cada uno vuelca un `.txt` legible en `results/` y las figuras en `figures/`. `_common.py` centraliza rutas, carga y la taxonomía anti-leakage. **Run All secuencial: 0 errores, stderr limpio.**
+
+**Archivos tocados (nuevos):**
+- `src/eda/_common.py` + `00_overview` … `08_drop_decisions` (9 scripts).
+- `results/00..08_*.txt` (9 reportes) y `figures/*.png` (12 figuras: `class_balance`, `correlation_matrix`, `correlation_spearman`, `missingness_bar`, `dist_{goals,elo,elo_diff,form}`, `boxplots_{outliers,odds}`, `elo_by_result`, `form_by_result`).
+
+**Hallazgos clave:**
+- **N/D confirmado: 230 557 × 48** (era la cifra de PLANNING; los kernels decían 226 755×42 = versión vieja del CSV). 38 ligas, 1214 equipos, 2000-07-28 → 2025-06-01.
+- **Balance FTResult**: H 44.6% / A 28.9% / D 26.5%. IR=1.68 (**desbalance moderado**, no severo). Baseline mayoritario a superar = 0.446. D es la clase difícil.
+- **CORRECCIÓN a `referencia-kernels.md`**: la nota "Elo solo desde ~2006" es **falsa** para esta versión. El nulo de Elo (~38.6%) es ~10-25% en 2000-2011 y **sube a 42-49% en 2012-2024** (ligas menores sin cobertura Elo). Filtrar por año NO resuelve el nulo.
+- **Señal pre-partido confirmada**: `elo_diff` separa H/D/A monótonamente (medias H=+44, D=−10, A=−61); `form5_diff` igual (H=+0.64, D=−0.41, A=−1.32). D queda en el medio → difícil.
+- **Cuotas ≈ "leak del sabio"**: Spearman `elo_diff~Odds ≈ 0.89`, `OddHome~OddAway = −0.98`. Confirma modelar CON y SIN odds.
+- **Elo simétrico** (elo_diff media≈0): no hay sesgo de emparejamiento por sede; la ventaja de localía es efecto de sede, no de Elo.
+- **Calidad de datos en cuotas**: centinelas/imposibles (`OddHome==0` en 7 filas, `HandiSize==−99.9`, `Max*` hasta 301) → limpiar/winsorizar. Elo/Form sin valores imposibles.
+- **Decisión de columnas**: 24 conservar (6 pre-seguras + 13 odds condicionales + contexto + target) / **24 descartar** (17 leakage post-partido + 6 `C_*` >51% nulo + `MatchTime` 57% nulo). 3 filas con FTResult nulo se descartan.
+
+**Para el siguiente (Fase 2 — Preprocessing):**
+- Insumo listo en `results/08_drop_decisions.txt` (tabla keep/drop + estrategia de nulos).
+- Elo: decidir entre (a) filtrar a partidos con Elo, (b) imputar mediana liga/temporada, (c) join temporal con `EloRatings.csv` (`date <= MatchDate`). Form: imputar 0. Odds: mediana o descartar sub-bloques >35% nulo.
+- Split **temporal** por `MatchDate` (no aleatorio), reportar F1 por clase.
+
+**Bloqueos / dudas abiertas:**
+- Notebook `1.0-eda.ipynb` pendiente (se arma cuando lo pida el usuario, portando estos scripts).
+
+---
+
 ## [2026-06-30 ~23:40] — Sergio — Fase 0 cerrada + esqueleto Fase 3
 
 **Qué hice:**

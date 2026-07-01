@@ -1,0 +1,92 @@
+======================================================================
+EDA 08 - DECISION DE COLUMNAS (cierre de Fase 1)
+======================================================================
+Dataset: 230,557 filas x 48 columnas.
+
+----------------------------------------------------------------------
+(1) CONSERVAR - features pre-partido seguras (input del modelo)
+----------------------------------------------------------------------
+  KEEP   HomeElo      nulos  38.6%
+  KEEP   AwayElo      nulos  38.6%
+  KEEP   Form3Home    nulos   0.7%
+  KEEP   Form5Home    nulos   0.7%
+  KEEP   Form3Away    nulos   0.7%
+  KEEP   Form5Away    nulos   0.7%
+  KEEP   Division     nulos   0.0%
+  KEEP   MatchDate    nulos   0.0%
+  KEEP   HomeTeam     nulos   0.0%
+  KEEP   AwayTeam     nulos   0.0%
+
+----------------------------------------------------------------------
+(2) CONSERVAR CONDICIONAL - cuotas de mercado
+----------------------------------------------------------------------
+  Modelar CON y SIN cuotas: son 'leak del sabio' (correlacion ~0.89 con
+  elo_diff). La version SIN cuotas es la mas honesta; la version CON mide
+  el techo. Limpiar antes: centinelas (OddHome==0, HandiSize==-99.9) y colas.
+  ODDS   OddHome      nulos   1.3%
+  ODDS   OddDraw      nulos   1.3%
+  ODDS   OddAway      nulos   1.3%
+  ODDS   MaxHome      nulos  12.0%
+  ODDS   MaxDraw      nulos  12.0%
+  ODDS   MaxAway      nulos  12.0%
+  ODDS   Over25       nulos  35.6%
+  ODDS   Under25      nulos  35.6%
+  ODDS   MaxOver25    nulos  35.6%
+  ODDS   MaxUnder25   nulos  35.6%
+  ODDS   HandiSize    nulos  32.0%
+  ODDS   HandiHome    nulos  32.1%
+  ODDS   HandiAway    nulos  32.1%
+
+----------------------------------------------------------------------
+(3) TARGET
+----------------------------------------------------------------------
+  FTResult: 3 filas nulas -> se descartan (sin etiqueta).
+
+----------------------------------------------------------------------
+(4) DESCARTAR - con motivo
+----------------------------------------------------------------------
+columna         %nulo  motivo
+MatchTime       57.0%  57% nulo y sin valor predictivo
+C_LTH           51.2%  cierre bookmaker poco documentado, 51% nulo
+C_LTA           51.2%  cierre bookmaker poco documentado, 51% nulo
+C_VHD           51.2%  cierre bookmaker poco documentado, 51% nulo
+C_VAD           51.2%  cierre bookmaker poco documentado, 51% nulo
+C_HTB           51.2%  cierre bookmaker poco documentado, 51% nulo
+C_PHB           51.2%  cierre bookmaker poco documentado, 51% nulo
+HomeTarget      50.6%  data leakage: estadistica POST-partido
+AwayTarget      50.6%  data leakage: estadistica POST-partido
+HomeFouls       50.6%  data leakage: estadistica POST-partido
+AwayFouls       50.6%  data leakage: estadistica POST-partido
+HomeCorners     50.4%  data leakage: estadistica POST-partido
+AwayCorners     50.4%  data leakage: estadistica POST-partido
+HomeShots       50.2%  data leakage: estadistica POST-partido
+AwayShots       50.2%  data leakage: estadistica POST-partido
+HomeYellow      48.3%  data leakage: estadistica POST-partido
+AwayYellow      48.3%  data leakage: estadistica POST-partido
+HomeRed         48.3%  data leakage: estadistica POST-partido
+AwayRed         48.3%  data leakage: estadistica POST-partido
+HTHome          23.7%  data leakage: estadistica POST-partido
+HTAway          23.7%  data leakage: estadistica POST-partido
+HTResult        23.7%  data leakage: estadistica POST-partido
+FTHome           0.0%  data leakage: estadistica POST-partido
+FTAway           0.0%  data leakage: estadistica POST-partido
+
+Total a descartar: 24 columnas.
+
+----------------------------------------------------------------------
+(5) NULOS A IMPUTAR (columnas que se conservan)
+----------------------------------------------------------------------
+  HomeElo/AwayElo: ~38.6% nulo, NO uniforme por anio (crece 2012-2024 por
+    ligas menores anadidas). NO imputar con 0. Opciones: (a) filtrar a
+    partidos con Elo, (b) imputar por mediana de liga/temporada, (c) usar el
+    Elo del archivo EloRatings.csv con join temporal (date <= MatchDate).
+  Form3/Form5: ~0.65% nulo (primeras jornadas) -> imputar 0 (sin historial).
+  Odds: 1-36% nulo segun columna -> imputar mediana o descartar sub-bloques
+    con >35% nulo (Over/Under, Handi) si se busca cobertura completa.
+
+----------------------------------------------------------------------
+RESUMEN NUMERICO
+----------------------------------------------------------------------
+  Conservadas (incl. condicionales + target): 24
+  Descartadas:                                24
+  Total:                                      48 de 48

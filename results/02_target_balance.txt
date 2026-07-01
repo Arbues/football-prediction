@@ -1,0 +1,26 @@
+======================================================================
+EDA 02 - BALANCE DE CLASES (FTResult)
+======================================================================
+Instancias etiquetadas: 230,554 (se excluyen 3 nulos)
+
+clase            conteo   porcentaje
+Local (H)       102,873       44.62%
+Empate (D)       61,121       26.51%
+Visita (A)       66,560       28.87%
+
+Ratio de desbalance IR = clase_mayor / clase_menor = 102,873 / 61,121 = 1.683
+Clase mayoritaria: H (Local (H))
+Clase minoritaria: D (Empate (D))
+
+Lectura: desbalance MODERADO (IR < 2). No exige sobre-muestreo agresivo,
+pero el empate (D) es minoritario y sera la clase mas dificil de predecir.
+Se recomienda class_weight='balanced' y reportar F1 por clase (no solo accuracy).
+
+----------------------------------------------------------------------
+BASELINES TRIVIALES (piso a superar)
+----------------------------------------------------------------------
+Accuracy prediciendo siempre la mayoritaria (H): 0.4462
+Accuracy de un clasificador aleatorio estratificado: 0.3527
+El modelo debe superar >= 0.4462 de accuracy para aportar valor.
+
+[figura] /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures/class_balance.png
