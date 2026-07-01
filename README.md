@@ -2,8 +2,8 @@
 
 Pipeline completo de Minería de Datos para predecir el resultado de partidos de fútbol europeo (2000–2025) usando técnicas de Machine Learning.
 
-**Curso:** Minería de Datos (CC442) — UNI  
-**Docente:** Dr. Marcos Antonio Alania Vicente  
+**Curso:** Minería de Datos (CC442) — UNI
+**Docente:** Dr. Marcos Antonio Alania Vicente
 **Ciclo:** 2026-I
 
 ## Dataset
@@ -77,6 +77,6 @@ python src/evaluation.py
 
 - Sergio Pezo
 - Luis Trujillo
-- [Tu nombre]
+- Arbues Perez
 
 **Licencia:** MIT
