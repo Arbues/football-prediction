@@ -4,6 +4,70 @@
 
 ---
 
+## [2026-07-01 ~11:30] — Sergio — Fase 3 (Modelado) + Fase 4 (Evaluación) en scripts + notebook
+
+**Qué hice (script-first, luego notebook):** 14 archivos en `src/modeling/`
+(`_common.py` + `00`…`12`), cada uno autocontenido, vuelca `.txt` a `results/modeling/`
+y `.png` a `figures/modeling/` (38 figuras), y registra su fila en
+`grid_search_results.csv`. Modelos serializados en `models/` (gitignored).
+
+**Protocolo (idéntico al plan):** `random_state=42` en todo; `fit` solo en train;
+**`TimeSeriesSplit(5)`** como CV interna para hiperparámetros dentro de train; `val`
+2022-23 para selección; `test` 2024-25 intacto. Optimización por **`f1_macro`**.
+Hiperparámetros "sin números mágicos": curvas de validación (LogReg C, árbol max_depth,
+NB var_smoothing, AdaBoost n_est) y RandomizedSearch para los pesados; se reportan los
+números reales. GPU RTX 3060: XGBoost `device='cuda'`, CatBoost `task_type='GPU'`.
+
+**Modelos y resultados en test (f1_macro):**
+- **Stacking (PROPUESTO)** 0.4187 · LightGBM 0.4188 · RandomForest 0.4165 · XGBoost
+  0.4162 · CatBoost 0.4152 · Voting 0.4142 · SVM-RBF 0.4132 · LogReg 0.4115 ·
+  DecisionTree 0.4078 · AdaBoost 0.3951 · GaussianNB 0.3918 · SVM-Linear 0.3347 ·
+  Dummy 0.2019. Todo el pelotón "real" se agrupa en ~0.42 (acc ~0.44), coherente con
+  el techo honesto sin cuotas.
+
+**Hallazgos clave (el "hilo" cerrado):**
+- **Empate = muro estructural.** F1 de D con techo ~0.28-0.30; recall de D máximo en
+  **SVM-RBF (0.314)**. La matriz de confusión confirma que H y A se lo comen.
+- **No linealidad demostrada.** LinearSVC hunde recall_D a 0.006 (predice local);
+  el mismo SVM con kernel RBF lo sube a 0.31. La frontera del empate no es lineal.
+- **Desbalance (experimento controlado, XGB fijo):** sin balanceo recall_D≈0.008;
+  `class_weight` lo sube a 0.24 con el mejor f1_macro; **SMOTE apenas ayuda (0.016)** —
+  interpolar sobre one-hot + empate sin región propia no crea frontera. Valida
+  `class_weight` como estrategia primaria.
+- **`elo_diff` es la variable rey**, confirmada por importancia por permutación (RF) y
+  por **SHAP** (TreeExplainer sobre XGBoost); le siguen h2h, forma y goles recientes.
+- **AdaBoost:** con stumps depth-1 degeneraba (recall_D=0, curva plana); con base
+  depth-3 se recupera (recall_D 0.288). Documentado.
+
+**Significancia (Wilcoxon, α=0.05, f1_macro por bloque mensual en test, n=17):** el
+Stacking **supera a Dummy (p=7.6e-06) y a GaussianNB (p=6.7e-04)** — mejora real, no azar.
+
+**Ensamble = contribución.** Voting (soft, bases congeladas con `FrozenEstimator`) y
+Stacking (meta-LogReg sobre OOF; el OOF interno usa `StratifiedKFold(5)` porque
+`cross_val_predict` exige partición — la temporalidad se preserva en val/test externos).
+El Stacking gana en val (0.4288) y es el propuesto.
+
+**Decisiones con el usuario (esta sesión):** SVM-RBF sobre submuestra estratificada
+temporal 35k (+ LinearSVC completo de contraste); ensamble = Voting **y** Stacking;
+propuesto para Wilcoxon = el mejor ensamble por val (Stacking); comparación PCA
+**omitida** (todos los lineales con L2 sobre matriz cruda). LightGBM forzado a **CPU**
+(en 191k×62 el kernel OpenCL se recompila por fit y resulta más lento que histograma CPU).
+
+**Bug corregido:** `CatBoost.predict()` en MultiClass devuelve 2D (n,1) y rompía la
+accuracy por broadcasting (daba ~1/3); `compute_metrics` ahora hace `ravel` defensivo.
+
+**Notebook `3.0-modeling-evaluation.ipynb`:** 49 celdas, estilo académico (4 bloques
+Fundamentación→Código→Interpretación→Discusión), autocontenido/portable a Colab,
+entrena inline (CV corta por agilidad; presupuestos completos en `src/modeling/`).
+**Run All limpio verificado con nbconvert (0 errores), device cuda.** Reproduce el
+ranking (Stacking gana). README y requirements (versiones fijadas) actualizados.
+
+**Para el siguiente (Fase 4/5 — Luis):** `results/modeling/11_test_metrics.csv`,
+`11_wilcoxon.txt`, `12_shap.txt` + 38 figuras listas para el paper IEEE. La matriz
+cruda con nombres (`X_*.parquet`) + `models/06_xgboost.pkl` sirven para más SHAP.
+
+---
+
 ## [2026-07-01 ~07:30] — Arbués — Fase 2 (Preprocessing) en scripts + Plan de Modelado
 
 **Qué hice (script-first, sin notebook aún por decisión del usuario):**
