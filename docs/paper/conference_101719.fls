@@ -1,0 +1,5 @@
+PWD /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/docs/paper
+INPUT /usr/share/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/docs/paper/conference_101719.tex
+OUTPUT conference_101719.log

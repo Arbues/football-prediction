@@ -1,0 +1,13 @@
+# Fdb version 4
+["pdflatex"] 1782867978.68678 "/home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/docs/paper/conference_101719.tex" "conference_101719.pdf" "conference_101719" 1782867978.74766 2
+  "/home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/docs/paper/conference_101719.tex" 1782867978.13882 15317 418fcc73a8072cf921dc73c69e091db9 ""
+  "/usr/share/texmf-dist/web2c/texmf.cnf" 1775415801 43569 fd570f2fa160877d211e859f687312ba ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1778961923 2349403 2964cc256203d4200d33e0a506ba8502 ""
+  "IEEEtran.cls" 0 -1 0 ""
+  "conference_101719.aux" 1782867970.68608 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "conference_101719.tex" 1782867978.13882 15317 418fcc73a8072cf921dc73c69e091db9 ""
+  (generated)
+  "conference_101719.aux"
+  "conference_101719.log"
+  "conference_101719.pdf"
+  (rewritten before read)
