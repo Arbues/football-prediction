@@ -1,0 +1,38 @@
+======================================================================
+EDA 10 - MULTICOLINEALIDAD (VIF)
+======================================================================
+Features del modelo lineal (9): ['HomeElo', 'AwayElo', 'Form3Home', 'Form5Home', 'Form3Away', 'Form5Away', 'OddHome', 'OddDraw', 'OddAway']
+Filas completas usadas: 129,661
+
+VIF por feature (desc):
+feature           VIF  interpretacion
+OddAway          8.85  moderada (5-10)
+HomeElo          6.61  moderada (5-10)
+AwayElo          6.33  moderada (5-10)
+OddDraw          6.06  moderada (5-10)
+OddHome          4.39  baja (<5)
+Form5Away        3.43  baja (<5)
+Form5Home        3.41  baja (<5)
+Form3Away        3.11  baja (<5)
+Form3Home        3.09  baja (<5)
+
+VIF medio = 5.03   VIF max = 8.85 (OddAway)
+
+----------------------------------------------------------------------
+REDUNDANCIA POR CONSTRUCCION (features derivadas)
+----------------------------------------------------------------------
+elo_diff = HomeElo - AwayElo  y  form_diff = FormHome - FormAway son
+combinaciones lineales EXACTAS: incluirlas junto a sus componentes vuelve
+singular a R (VIF -> infinito). Regla para el modelado lineal: usar los
+DIFFS *o* los componentes, nunca ambos. Los arboles (RF/XGB/LGBM) son
+inmunes a la multicolinealidad, alli el problema no aplica.
+
+----------------------------------------------------------------------
+LECTURA
+----------------------------------------------------------------------
+Features con VIF grave (>10): ninguna
+Features con VIF moderado (5-10): ['OddAway', 'HomeElo', 'AwayElo', 'OddDraw']
+Form3* y Form5* del mismo equipo estan correlacionadas (r~0.82); si un
+modelo lineal sufre, conservar solo Form5 (ventana mas larga, mas informacion).
+
+[figura] vif_barplot.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures

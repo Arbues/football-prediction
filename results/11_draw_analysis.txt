@@ -1,0 +1,51 @@
+======================================================================
+EDA 11 - ANATOMIA DEL EMPATE (clase D)
+======================================================================
+Tasa de empate global: 26.51%
+
+----------------------------------------------------------------------
+(1) RESULTADO vs |elo_diff| (paridad de fuerzas)
+----------------------------------------------------------------------
+|elo_diff|        n      H%      D%      A%
+0-25         23,953   44.0   29.8   26.2
+25-50        21,950   44.4   29.6   25.9
+50-100       34,995   44.6   28.5   26.9
+100-200      34,241   45.7   25.4   28.9
+>200         17,200   47.6   18.3   34.1
+
+Tasa de empate MAXIMA sobre todos los bins: 29.8% (en partidos parejos).
+El empate NUNCA es mayoritario: ni siquiera con equipos identicos supera ~30%.
+=> Ningun modelo puede volver a D la clase mas probable en ninguna region;
+   su recall tiene un techo estructural bajo (coherente con Yeung 2023, etc.).
+
+----------------------------------------------------------------------
+(2) RESULTADO vs elo_diff con signo
+----------------------------------------------------------------------
+elo_diff                n      H%      D%      A%
+(-10000.0, -200.0]    8,600   16.7   22.1   61.3
+(-200.0, -100.0]   17,158   29.3   27.8   42.9
+(-100.0, -50.0]    17,464   36.3   30.0   33.7
+(-50.0, -25.0]     10,955   40.3   30.4   29.3
+(-25.0, 0.0]       12,204   42.4   30.3   27.3
+(0.0, 25.0]        11,817   45.6   29.3   25.1
+(25.0, 50.0]       10,998   48.5   28.9   22.5
+(50.0, 100.0]      17,531   52.9   26.9   20.2
+(100.0, 200.0]     17,083   62.3   22.9   14.8
+(200.0, 10000.0]    8,601   78.6   14.6    6.9
+
+----------------------------------------------------------------------
+(3) TASA DE EMPATE vs |form5_diff|
+----------------------------------------------------------------------
+|form5_diff|        n      D%
+0              20,343   27.7
+1-2            73,100   27.3
+3-4            59,577   26.6
+5-6            39,657   26.1
+>6             36,379   24.5
+
+Conclusion: la paridad (Elo y forma similares) eleva el empate solo hasta
+~30%. Es una clase difusa, sin region propia donde domine: por eso todos los
+clasificadores de la literatura reportan su recall <35%. Se recomienda
+reportar F1 por clase y no optimizar solo accuracy.
+
+[figura] draw_analysis.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures

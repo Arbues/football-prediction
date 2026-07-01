@@ -1,0 +1,78 @@
+======================================================================
+EDA 09 - OUTLIERS MULTIVARIADOS (MAHALANOBIS)
+======================================================================
+Features del espacio conjunto (6): ['HomeElo', 'AwayElo', 'Form3Home', 'Form5Home', 'Form3Away', 'Form5Away']
+Observaciones completas (sin nulos): 132,005
+Umbral chi2(0.999, df=6) sobre D_M^2 = 22.458
+
+D_M^2: min=0.06  media=6.00  mediana=5.47  max=35.11
+(bajo normalidad multivariante, E[D_M^2] = df = 6)
+
+Outliers multivariados (D_M^2 > umbral): 78 (0.06%)
+
+----------------------------------------------------------------------
+MULTIVARIADO vs UNIVARIADO (misma muestra)
+----------------------------------------------------------------------
+Outlier en >=1 variable (IQR univariado): 2,214 (1.68%)
+Outlier multivariado (Mahalanobis):       78 (0.06%)
+Multivariado PERO no univariado: 28 (anomalos por COMBINACION, invisibles al analisis por columna)
+Univariado PERO no multivariado: 2,164 (extremos en una variable pero coherentes con la estructura conjunta)
+
+----------------------------------------------------------------------
+QUE VARIABLE DISPARA EL OUTLIER (|z| maximo entre los atipicos)
+----------------------------------------------------------------------
+  AwayElo       30 outliers (38%)
+  HomeElo       29 outliers (37%)
+  Form5Home     12 outliers (15%)
+  Form5Away      5 outliers (6%)
+  Form3Home      2 outliers (3%)
+  -> Elo (Home/Away) domina: la mayoria son equipos cuyo rating esta muy
+     lejos de la media de su liga.
+
+----------------------------------------------------------------------
+ARQUETIPOS DE OUTLIER (interpretacion futbolera)
+----------------------------------------------------------------------
+   53x  Elo extremo (super-club en el techo / colista en el piso)
+    7x  Local debil en racha (Elo bajo + forma perfecta)
+    6x  Combinacion fuerza-forma atipica (mixta)
+    5x  Visita debil en racha (Elo bajo + forma perfecta)
+    4x  Visita fuerte en crisis (Elo alto + forma nula)
+    3x  Local fuerte en crisis (Elo alto + forma nula)
+
+TOP-8 outliers (equipos reales, valores y z-scores):
+  D_M^2= 35.1 | Utrecht (Elo 1462, F5 15) vs PSV Eindhoven (Elo 1742, F5 0) | N1 2000-08-27
+           z: HomeElo=-0.5 Form5H=+2.5  AwayElo=+1.3 Form5A=-2.1  -> Visita fuerte en crisis (Elo alto + forma nula)
+  D_M^2= 30.8 | Real Madrid (Elo 1954, F5 1) vs Valladolid (Elo 1664, F5 13) | SP1 2018-11-03
+           z: HomeElo=+2.7 Form5H=-1.7  AwayElo=+0.8 Form5A=+1.8  -> Local fuerte en crisis (Elo alto + forma nula)
+  D_M^2= 30.3 | Braunschweig (Elo 1576, F5 7) vs Bayern Munich (Elo 2062, F5 7) | D1 2014-04-19
+           z: HomeElo=+0.2 Form5H=+0.1  AwayElo=+3.4 Form5A=+0.0  -> Elo extremo (super-club en el techo / colista en el piso)
+  D_M^2= 29.3 | Real Madrid (Elo 2060, F5 7) vs Vallecano (Elo 1657, F5 13) | SP1 2014-03-29
+           z: HomeElo=+3.4 Form5H=+0.1  AwayElo=+0.8 Form5A=+1.8  -> Elo extremo (super-club en el techo / colista en el piso)
+  D_M^2= 27.9 | Jaen (Elo 1492, F5 15) vs Ath Madrid (Elo 1685, F5 0) | SP2 2000-09-17
+           z: HomeElo=-0.3 Form5H=+2.5  AwayElo=+0.9 Form5A=-2.1  -> Combinacion fuerza-forma atipica (mixta)
+  D_M^2= 27.4 | Vallecano (Elo 1692, F5 12) vs Real Madrid (Elo 2046, F5 7) | SP1 2015-04-08
+           z: HomeElo=+1.0 Form5H=+1.6  AwayElo=+3.3 Form5A=+0.0  -> Elo extremo (super-club en el techo / colista en el piso)
+  D_M^2= 27.4 | Paris SG (Elo 1876, F5 10) vs Amiens (Elo 1470, F5 15) | F1 2017-08-05
+           z: HomeElo=+2.2 Form5H=+1.0  AwayElo=-0.5 Form5A=+2.5  -> Combinacion fuerza-forma atipica (mixta)
+  D_M^2= 27.4 | Ajax (Elo 1870, F5 10) vs Go Ahead Eagles (Elo 1373, F5 10) | N1 2021-11-07
+           z: HomeElo=+2.2 Form5H=+1.0  AwayElo=-1.1 Form5A=+0.9  -> Combinacion fuerza-forma atipica (mixta)
+
+----------------------------------------------------------------------
+EXPLICACION FUTBOLERA
+----------------------------------------------------------------------
+Dos historias detras de los atipicos multivariados:
+ (1) SUPER-CLUBES: la mayoria son Bayern, Real Madrid, PSG, Ajax, etc., con
+     Elo ~2000-2100, muy por encima del ~1533 medio. Son raros porque muy
+     pocos equipos alcanzan ese nivel; el rating por si solo los aleja.
+ (2) CONTRADICCION FUERZA-FORMA (los que el IQR NO ve): un grande con racha
+     de derrotas (Elo alto + forma 0, p.ej. Real Madrid 2018 con Form5=1) o
+     un modesto en racha perfecta (Elo bajo + Form5=15, p.ej. Jaen o Amiens).
+     Ninguno de los dos campos es extremo por si solo, pero la COMBINACION
+     rompe la relacion esperada (Elo y forma correlacionan r~0.31): por eso
+     solo la distancia de Mahalanobis los detecta.
+
+Lectura: la distancia de Mahalanobis captura anomalias por COMBINACION de
+variables (p. ej. Elo alto con forma nula) que el IQR por columna no ve. La
+cola pesada frente a la chi2 teorica indica leve no-normalidad multivariante.
+
+[figura] mahalanobis_outliers.png en /home/sergi/Documents/semesters/eight/dm/pc5/football-prediction/figures
