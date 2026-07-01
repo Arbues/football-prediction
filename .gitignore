@@ -50,3 +50,7 @@ catboost_info/
 *.fdb_latexmk
 *.synctex.gz
 missfont.log
+*.nav
+*.snm
+*.toc
+*.vrb
