@@ -1,11 +1,14 @@
 """Simula el cuadro completo del Mundial 2026 (16avos -> final + 3er puesto) con el
-modelo propuesto (Stacking) y genera una web (docs/bracket.html) con el resultado.
+modelo propuesto (Stacking) y genera una web (docs/bracket.html).
 
-Fuera de distribución (modelos entrenados con clubes). Cada cruce se predice en las DOS
-orientaciones y se promedia para cancelar el sesgo de localía (sede neutral): decide el
-Elo, la variable dominante. Los 7 partidos ya jugados usan el resultado REAL; el resto,
-la predicción del modelo. En eliminatoria no hay empate: avanza el equipo con mayor
-probabilidad de ganar (la masa de empate se reparte).
+Features REALES por selección: Elo actual + rendimiento de la FASE DE GRUPOS 2026
+(puntos -> forma, goles a favor/en contra -> promedio de gol y racha). NO es solo Elo:
+el modelo usa las diferencias de forma y de gol, así que un equipo con Elo algo menor
+pero mejor fase de grupos puede quedar por delante. Cada cruce se predice en las DOS
+orientaciones y se promedia (sede neutral, sin sesgo de localía). Los 7 partidos ya
+jugados usan el resultado REAL; el resto, la predicción. En eliminatoria avanza el de
+mayor probabilidad de ganar. Sigue siendo demo fuera de distribución (entrenado con
+clubes); h2h y descanso se dejan neutros por falta de datos comparables.
 """
 import json
 import warnings
@@ -17,14 +20,27 @@ import _common as C
 
 warnings.filterwarnings("ignore")
 
-ELO = {
-    "ARG": 2130, "ESP": 2120, "FRA": 2085, "ENG": 2050, "BRA": 2030, "POR": 2005,
-    "NED": 1990, "GER": 1955, "BEL": 1945, "CRO": 1920, "COL": 1900, "MAR": 1895,
-    "NOR": 1860, "SUI": 1855, "JPN": 1845, "SEN": 1840, "ECU": 1825, "SWE": 1810,
-    "MEX": 1800, "USA": 1795, "AUT": 1790, "CIV": 1790, "CAN": 1785, "DZA": 1770,
-    "AUS": 1745, "GHA": 1730, "BIH": 1720, "PAR": 1720, "EGY": 1710, "COD": 1690,
-    "RSA": 1680, "CPV": 1620,
+# Datos REALES: Elo (eloratings/búsqueda) + fase de grupos Mundial 2026 (NBC Sports):
+# gf/ga/pts = goles a favor, en contra y puntos en los 3 partidos de grupo.
+TEAMS = {
+    "ARG": {"elo": 2144, "gf": 10, "ga": 3, "pts": 9}, "ESP": {"elo": 2144, "gf": 8, "ga": 3, "pts": 7},
+    "FRA": {"elo": 2123, "gf": 10, "ga": 2, "pts": 9}, "ENG": {"elo": 2050, "gf": 8, "ga": 4, "pts": 7},
+    "BRA": {"elo": 2009, "gf": 10, "ga": 4, "pts": 7}, "POR": {"elo": 2005, "gf": 6, "ga": 1, "pts": 4},
+    "NED": {"elo": 1990, "gf": 9, "ga": 3, "pts": 7}, "GER": {"elo": 1955, "gf": 8, "ga": 2, "pts": 6},
+    "BEL": {"elo": 1945, "gf": 5, "ga": 2, "pts": 5}, "CRO": {"elo": 1920, "gf": 6, "ga": 6, "pts": 6},
+    "COL": {"elo": 1900, "gf": 6, "ga": 3, "pts": 6}, "MAR": {"elo": 1895, "gf": 8, "ga": 5, "pts": 7},
+    "NOR": {"elo": 1860, "gf": 6, "ga": 5, "pts": 6}, "SUI": {"elo": 1855, "gf": 9, "ga": 5, "pts": 7},
+    "JPN": {"elo": 1845, "gf": 6, "ga": 2, "pts": 5}, "SEN": {"elo": 1840, "gf": 4, "ga": 3, "pts": 4},
+    "ECU": {"elo": 1825, "gf": 4, "ga": 4, "pts": 4}, "SWE": {"elo": 1810, "gf": 4, "ga": 4, "pts": 4},
+    "MEX": {"elo": 1800, "gf": 9, "ga": 3, "pts": 9}, "USA": {"elo": 1795, "gf": 7, "ga": 3, "pts": 6},
+    "AUT": {"elo": 1790, "gf": 4, "ga": 4, "pts": 4}, "CIV": {"elo": 1790, "gf": 7, "ga": 5, "pts": 6},
+    "CAN": {"elo": 1785, "gf": 9, "ga": 4, "pts": 4}, "DZA": {"elo": 1770, "gf": 2, "ga": 4, "pts": 4},
+    "AUS": {"elo": 1745, "gf": 4, "ga": 4, "pts": 4}, "GHA": {"elo": 1730, "gf": 4, "ga": 4, "pts": 4},
+    "BIH": {"elo": 1720, "gf": 3, "ga": 4, "pts": 4}, "PAR": {"elo": 1720, "gf": 3, "ga": 5, "pts": 4},
+    "EGY": {"elo": 1710, "gf": 4, "ga": 2, "pts": 5}, "COD": {"elo": 1690, "gf": 5, "ga": 4, "pts": 4},
+    "RSA": {"elo": 1680, "gf": 5, "ga": 6, "pts": 4}, "CPV": {"elo": 1620, "gf": 3, "ga": 3, "pts": 3},
 }
+ELO = {k: v["elo"] for k, v in TEAMS.items()}
 NAME = {
     "GER": "Alemania", "PAR": "Paraguay", "FRA": "Francia", "SWE": "Suecia",
     "RSA": "Sudáfrica", "CAN": "Canadá", "NED": "P. Bajos", "MAR": "Marruecos",
@@ -76,21 +92,29 @@ _FEATS = json.load(open(C.PROC / "feature_names.json"))
 _MODEL = joblib.load(C.MODELS / "10_stacking.pkl")
 
 
-def _row(eh, ea):
+def _row(hc, ac):
+    """Fila cruda con features REALES de fase de grupos para el cruce hc(local) vs ac."""
+    h, a = TEAMS[hc], TEAMS[ac]
+    hgf, hga, agf, aga = h["gf"] / 3, h["ga"] / 3, a["gf"] / 3, a["ga"] / 3   # goles/partido
+    hf5, af5 = h["pts"] / 3 * 5, a["pts"] / 3 * 5    # puntos escalados a 5 partidos
+    hf3, af3 = h["pts"], a["pts"]                     # puntos en 3 (≈ Form3)
+    hws, aws = h["pts"] // 3, a["pts"] // 3           # aprox. de victorias/racha
     return {"match_id": 0, "Division": "WC", "MatchDate": pd.Timestamp("2026-07-05"),
-            "HomeTeam": "H", "AwayTeam": "A", "FTResult": "H", "year": 2026, "split": "test",
-            "HomeElo": eh, "AwayElo": ea, "elo_diff": eh - ea,
-            "Form5Home": 7, "Form5Away": 7, "form5_diff": 0, "Form3Home": 4,
-            "Form3Away": 4, "form3_diff": 0, "home_gf5": 1.4, "away_gf5": 1.4,
-            "gf5_diff": 0, "home_ga5": 1.1, "away_ga5": 1.1, "ga5_diff": 0,
-            "home_rest_days": 5, "away_rest_days": 5, "home_win_streak": 1,
-            "away_win_streak": 1, "h2h_played": 0, "h2h_home_winrate": 0.5,
-            "h2h_avg_goals": 2.5, "is_top_league": 0, "elo_missing": 0}
+            "HomeTeam": hc, "AwayTeam": ac, "FTResult": "H", "year": 2026, "split": "test",
+            "HomeElo": h["elo"], "AwayElo": a["elo"], "elo_diff": h["elo"] - a["elo"],
+            "Form5Home": hf5, "Form5Away": af5, "form5_diff": hf5 - af5,
+            "Form3Home": hf3, "Form3Away": af3, "form3_diff": hf3 - af3,
+            "home_gf5": hgf, "away_gf5": agf, "gf5_diff": hgf - agf,
+            "home_ga5": hga, "away_ga5": aga, "ga5_diff": hga - aga,
+            "home_rest_days": 5, "away_rest_days": 5,
+            "home_win_streak": hws, "away_win_streak": aws,
+            "h2h_played": 0, "h2h_home_winrate": 0.5, "h2h_avg_goals": 2.5,
+            "is_top_league": 0, "elo_missing": 0}
 
 
 def _neutral_probs(a, b):
     """Prob. (a_gana, b_gana, empate) promediando las dos orientaciones (sede neutral)."""
-    df = pd.DataFrame([_row(ELO[a], ELO[b]), _row(ELO[b], ELO[a])])[list(_PRE.feature_names_in_)]
+    df = pd.DataFrame([_row(a, b), _row(b, a)])[list(_PRE.feature_names_in_)]
     X = pd.DataFrame(_PRE.transform(df), columns=_FEATS)
     P = _MODEL.predict_proba(X)  # columnas [A, D, H]
     pa = 0.5 * (P[0][2] + P[1][0])
@@ -108,7 +132,9 @@ def play(a, b):
     else:
         w, sa, sb, real = pick, f"{round(100 * pa)}%", f"{round(100 * pb)}%", False
     return {"a": a, "b": b, "ea": ELO[a], "eb": ELO[b], "pa": pa, "pb": pb, "pd": pd_,
-            "w": w, "sa": sa, "sb": sb, "real": real, "pick": pick}
+            "w": w, "sa": sa, "sb": sb, "real": real, "pick": pick,
+            "fa": TEAMS[a]["pts"], "fb": TEAMS[b]["pts"],
+            "gfa": TEAMS[a]["gf"], "gfb": TEAMS[b]["gf"]}
 
 
 def round_of(pairs):
@@ -189,7 +215,7 @@ def col(matches, header, extra=""):
 
 
 def explain(m):
-    """Texto que justifica el resultado del cruce a partir del Elo y las probs."""
+    """Justifica el cruce con Elo + forma real (puntos y goles de la fase de grupos)."""
     a, b, w = m["a"], m["b"], m["w"]
     na, nb, nw = NAME[a], NAME[b], NAME[w]
     d = abs(m["ea"] - m["eb"])
@@ -197,34 +223,34 @@ def explain(m):
     fav = a if m["pa"] >= m["pb"] else b
     nfav, favp = NAME[fav], max(m["pa"], m["pb"])
     gap = abs(m["pa"] - m["pb"])
-    if d >= 200:
-        nivel = f"un abismo de nivel ({d} puntos Elo)"
-    elif d >= 100:
-        nivel = f"una ventaja clara ({d} puntos Elo)"
-    elif d >= 40:
-        nivel = f"una ligera ventaja ({d} puntos Elo)"
-    else:
-        nivel = f"un Elo casi idéntico (solo {d} puntos)"
-    base = f"<b>Elo:</b> {na} {m['ea']} vs {nb} {m['eb']} — {nivel} para {mayor}. "
+    nivel = ("un abismo de nivel" if d >= 200 else "ventaja clara" if d >= 100
+             else "ligera ventaja" if d >= 40 else "Elo casi idéntico")
+    base = (f"<b>Elo:</b> {na} {m['ea']} vs {nb} {m['eb']} — {nivel} ({d} pts) para {mayor}. "
+            f"<b>Forma en grupos:</b> {na} {m['fa']} pts y {m['gfa']} goles; "
+            f"{nb} {m['fb']} pts y {m['gfb']} goles. ")
     if m["real"]:
         pens = "(" in m["sa"] or "(" in m["sb"]
         if m["pick"] == w:
-            return (base + f"<b>Resultado real</b> ({m['sa']}–{m['sb']}): el modelo favorecía a "
-                    f"{nfav} ({favp:.0%}) y así fue. Acierto.")
-        t = (base + f"<b>Resultado real</b> ({m['sa']}–{m['sb']}): sorpresa. El modelo daba "
-             f"favorito a {nfav} ({favp:.0%}), pero avanzó {nw}.")
+            return (base + f"El modelo (Elo+forma) favorecía a {nfav} ({favp:.0%}) y así fue "
+                    f"({m['sa']}–{m['sb']}). Acierto.")
+        t = (base + f"El modelo daba favorito a {nfav} ({favp:.0%}), pero avanzó {nw} "
+             f"({m['sa']}–{m['sb']}).")
         if pens:
-            t += (f" En los 90' fue empate —el modelo le asignaba {m['pd']:.0%} a la igualdad— y se "
-                  f"definió por penales, que son azar puro: ningún modelo de Elo los predice.")
+            t += (f" Fue empate en los 90' —{m['pd']:.0%} de empate para el modelo— y se definió "
+                  f"por penales, azar puro.")
         return t
+    elo_fav = a if m["ea"] >= m["eb"] else b
+    matiz = ""
+    if elo_fav != fav:
+        matiz = (f" Aquí la <b>forma pesa más que el Elo</b>: {nfav} llegó mejor de la fase de "
+                 f"grupos y el modelo lo pone por delante pese a un Elo algo menor.")
     if gap >= 0.40:
         lect = f"victoria muy probable de {nfav} ({favp:.0%})"
     elif gap >= 0.18:
-        lect = f"{nfav} es el favorito ({favp:.0%})"
+        lect = f"{nfav} favorito ({favp:.0%})"
     else:
-        lect = f"casi un volado: {na} {m['pa']:.0%} vs {nb} {m['pb']:.0%}, se decide por décimas"
-    return (base + f"<b>Predicción:</b> {lect}. Con el resto de variables en simetría, manda la "
-            f"diferencia de Elo. Avanza {nw}.")
+        lect = f"casi un volado: {na} {m['pa']:.0%} vs {nb} {m['pb']:.0%}"
+    return (base + f"<b>Predicción:</b> {lect}.{matiz} Avanza {nw}.")
 
 
 def acc_item(m):
@@ -332,8 +358,9 @@ def build_html(l16, l8, l4, lsemi, r16, r8, r4, rsemi, fin, third, champ):
 </style></head>
 <body>
 <header><h1>Fase Eliminatoria — Mundial 2026</h1>
-<span class="sub">Simulación con el modelo <b>Stacking</b> · 7 partidos con resultado real,
-resto predicho (números = prob. de ganar) · demo fuera de distribución</span></header>
+<span class="sub">Modelo <b>Stacking</b> con features reales (Elo + forma y goles de la fase de
+grupos) · 7 partidos con resultado oficial, resto predicho (números = prob. de ganar) ·
+demo fuera de distribución</span></header>
 <div class="bracket">{body}</div>
 {acc}
 </body></html>"""
