@@ -21,8 +21,17 @@ data/processed/*
 !data/processed/.gitkeep
 
 # === Modelos serializados ===
+# Se versionan los modelos ligeros (<50MB) y el preprocesador para inferencia directa.
+# Los ensambles pesados (Random Forest, Voting, Stacking) NO se suben: superan el umbral
+# recomendado de GitHub (50MB) y se regeneran con src/modeling/ (ver models/README.md).
 models/*
 !models/.gitkeep
+!models/README.md
+!models/*.pkl
+!models/*.joblib
+models/03_random_forest.pkl
+models/10_voting.pkl
+models/10_stacking.pkl
 
 # === Kaggle cache ===
 /root/.cache/kagglehub/
