@@ -6,6 +6,8 @@ Pipeline completo de Minería de Datos para predecir el resultado de partidos de
 **Docente:** Dr. Marcos Antonio Alania Vicente
 **Ciclo:** 2026-I
 
+**Entregables:** 📄 [Artículo IEEE (PDF)](docs/paper/paper.pdf) · 🎤 [Presentación (PDF)](docs/presentation/presentation.pdf) · 📓 [Cuadernos](notebooks/)
+
 ## Dataset
 
 **Club Football Match Data (2000–2025)** — [Kaggle](https://www.kaggle.com/datasets/adamgbor/club-football-match-data-2000-2025)
@@ -20,16 +22,18 @@ Pipeline completo de Minería de Datos para predecir el resultado de partidos de
 
 ## Requisitos
 
-- Python ≥ 3.10
-- Dependencias en `requirements.txt`
+- Python ≥ 3.10 (probado en 3.12)
+- Sistemas operativos soportados: Linux, macOS y Windows (WSL2 recomendado en Windows)
+- Dependencias con versiones fijadas en `requirements.txt`
+- GPU NVIDIA **opcional** (acelera XGBoost/CatBoost; el pipeline también corre íntegro en CPU)
 
 ## Instalación
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Arbues/football-prediction.git
 cd football-prediction
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -58,6 +62,30 @@ Cada script de `src/modeling/` es autocontenido y comparte `src/modeling/_common
 (semillas, carga, `TimeSeriesSplit`, métricas y figuras). El entrenamiento con GPU
 (RTX 3060) usa `device='cuda'` en XGBoost y `task_type='GPU'` en CatBoost.
 
+## Reproducibilidad
+
+El pipeline está diseñado para que un evaluador externo obtenga **exactamente los mismos
+números** sin intervención manual:
+
+- **Semilla global fija (`random_state = 42`)** en Python, NumPy y en cada estimador,
+  búsqueda de hiperparámetros y pliegue de validación. No se deja aleatoriedad al azar del
+  reloj del hardware.
+- **Versiones de librerías fijadas** con `==` en `requirements.txt`, probadas en Python 3.12.
+- **Sin fuga de datos (*no data leakage*):** toda estadística de transformación
+  (medias/desviaciones de estandarización, imputaciones, codificaciones) se ajusta **solo
+  sobre el conjunto de entrenamiento** y se aplica de forma ciega a validación y prueba. La
+  partición es **temporal** (train ≤ 2021 · val 2022–2023 · test 2024–2025) y se verifica
+  con un bloque anti-fuga explícito en `2.0-preprocessing.ipynb`.
+- **Descarga automática de datos:** los notebooks `1.0` y `2.0` obtienen el dataset vía
+  `kagglehub` (con *fallback* a la API de Kaggle); no requieren que el evaluador cargue
+  archivos a mano. En un entorno limpio (p. ej. Colab) exportar las credenciales Kaggle
+  (`KAGGLE_USERNAME` / `KAGGLE_KEY`) o dejar el CSV en `data/raw/`.
+- **Orden de ejecución obligatorio:** `1.0 → 2.0 → 3.0`. El notebook `3.0` consume los
+  `data/processed/*.parquet` que genera `2.0`, de modo que `2.0` debe ejecutarse primero.
+- **Artefactos versionados:** las métricas quedan en `results/`, las figuras en `figures/`
+  y los modelos serializados en `models/`; toda cifra del artículo y de la tabla siguiente
+  se regenera desde estos scripts.
+
 ## Resultados Clave
 
 Evaluación en **test (2024–2025)**, optimizando `f1_macro` (el empate pesa igual). El
@@ -83,17 +111,19 @@ variable dominante es `elo_diff`, confirmada por importancia por permutación y 
 
 ## Estructura del Repositorio
 
+> Cada carpeta principal incluye su propio `README.md` que explica su contenido y cómo se genera.
+
 ```
 .
-├── data/               ← Datos crudos y procesados
-│   ├── raw/
-│   └── processed/
-├── notebooks/          ← Jupyter/Colab notebooks
-├── src/                ← Código fuente modular
-├── models/             ← Modelos serializados (.pkl)
-├── figures/            ← Gráficos para el artículo
-├── results/            ← Métricas y reportes CSV/JSON
-├── docs/               ← Artículo IEEE + Presentación Beamer
+├── data/               ← Datos crudos y procesados        (data/README.md)
+│   ├── raw/            ← CSV originales de Kaggle (solo lectura)
+│   └── processed/      ← Matrices .parquet listas para el modelo
+├── notebooks/          ← 3 cuadernos del pipeline          (notebooks/README.md)
+├── src/                ← Código fuente modular por fase    (src/README.md)
+├── models/             ← Modelos serializados (.pkl)       (models/README.md)
+├── figures/            ← Gráficos del artículo (.png)      (figures/README.md)
+├── results/            ← Métricas y reportes (.txt/.csv)   (results/README.md)
+├── docs/               ← Artículo IEEE + Presentación      (docs/README.md)
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
@@ -102,8 +132,10 @@ variable dominante es `elo_diff`, confirmada por importancia por permutación y 
 
 ## Créditos
 
-- Sergio Pezo
-- Luis Trujillo
-- Arbues Perez
+- Arbués Enrique Pérez Villegas
+- Luis Andre Trujillo Serva
+- Sergio Sebastian Pezo Jimenez
+
+Escuela de Ciencia de la Computación — Universidad Nacional de Ingeniería.
 
 **Licencia:** MIT
