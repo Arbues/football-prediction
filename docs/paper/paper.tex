@@ -18,30 +18,18 @@
 
 \begin{document}
 
-\title{Comparaci\'on Emp\'irica de Seis Clasificadores Supervisados para la
-Predicci\'on Multiclase de Resultados de F\'utbol a Escala Multi-Liga (2000--2025)\\
-{\footnotesize Curso: Miner\'ia de Datos (CC442) --- Ciclo Acad\'emico 2026-I ---
+\title{Clasificaci\'on Multiclase de Resultados de F\'utbol a Escala Multi-Liga
+con Validaci\'on Temporal y An\'alisis de Significancia Estad\'istica\\
+{\footnotesize Curso: Miner\'ia de Datos (CC442) - Ciclo Acad\'emico 2026-I -
 Prof. Dr. Marcos Antonio Alania Vicente}
 }
 
 \author{
-\IEEEauthorblockN{Arb\'ues Enrique P\'erez Villegas}
-\IEEEauthorblockA{\textit{Escuela de Ciencia de la Computaci\'on} \\
-\textit{Universidad Nacional de Ingenier\'ia}\\
-Lima, Per\'u \\
-arbues.perez@uni.pe}
-\and
-\IEEEauthorblockN{Sergio Sebastian Pezo Jimenez}
-\IEEEauthorblockA{\textit{Escuela de Ciencia de la Computaci\'on} \\
-\textit{Universidad Nacional de Ingenier\'ia}\\
-Lima, Per\'u \\
-sergio.pezo@uni.pe}
-\and
-\IEEEauthorblockN{Luis Andre Trujillo Serva}
-\IEEEauthorblockA{\textit{Escuela de Ciencia de la Computaci\'on} \\
-\textit{Universidad Nacional de Ingenier\'ia}\\
-Lima, Per\'u \\
-luis.trujillo@uni.pe}
+\IEEEauthorblockN{Arb\'ues Enrique P\'erez Villegas \quad Luis Andre Trujillo Serva
+\quad Sergio Sebastian Pezo Jimenez}
+\IEEEauthorblockA{\textit{Escuela de Ciencia de la Computaci\'on, Universidad Nacional de Ingenier\'ia}\\
+Lima, Per\'u\\
+\{arbues.perez.v,\ luis.trujillo.s,\ sergio.pezo.j\}@uni.pe}
 }
 
 \maketitle
@@ -90,25 +78,26 @@ informaci\'on temporal.
 
 La motivaci\'on t\'ecnica de este estudio nace de una brecha concreta en la literatura
 (Secci\'on~\ref{sec:related}): los trabajos que operan a gran escala emplean m\'etricas
-probabil\'isticas como el \emph{Ranked Probability Score} y un repertorio reducido de
+probabil\'isticas como el \emph{Ranked Probability Score} (RPS) y un repertorio reducido de
 algoritmos, mientras que los que comparan clasificadores con m\'etricas est\'andar utilizan
 conjuntos de datos peque\~nos. Este trabajo cierra esa brecha con una evaluaci\'on amplia,
 por clase y con contraste de significancia, sobre un conjunto de gran escala.
 
 Las contribuciones concretas son las siguientes:
 \begin{enumerate}
-\item Una comparaci\'on emp\'irica controlada de nueve familias de clasificadores
-      ---incluyendo los tres motores modernos de \emph{gradient boosting}
+\item Una comparaci\'on emp\'irica controlada de nueve familias de clasificadores, incluyendo los tres motores modernos de \emph{gradient boosting}
       (XGBoost, LightGBM y CatBoost) y ensambles de tipo \emph{voting} y
-      \emph{stacking}--- sobre 230\,554 partidos multi-liga, con reproducibilidad
-      determinista y c\'omputo en GPU.
+      \emph{stacking}, sobre 230\,554 partidos multi-liga, con reproducibilidad
+      determinista y c\'omputo en unidad de procesamiento gr\'afico (GPU).
 \item Un protocolo de evaluaci\'on honesto para datos desbalanceados y con deriva
       temporal: partici\'on por fecha, validaci\'on con \texttt{TimeSeriesSplit},
       optimizaci\'on de F1 macro y reporte por clase con prueba de Wilcoxon.
 \item Evidencia experimental sobre tres cuestiones metodol\'ogicas: la naturaleza no
       lineal de la frontera del empate, la superioridad del reponderado por clase frente
-      al sobremuestreo sint\'etico SMOTE, y la dominancia del \emph{rating} Elo v\'ia
-      an\'alisis SHAP.
+      al sobremuestreo sint\'etico de la clase minoritaria (SMOTE, del ingl\'es
+      \emph{Synthetic Minority Over-sampling Technique}), y la dominancia del
+      \emph{rating} Elo seg\'un los valores SHAP (del ingl\'es \emph{SHapley Additive
+      exPlanations}, atribuciones aditivas basadas en la teor\'ia de juegos).
 \end{enumerate}
 
 El resto de este art\'iculo se organiza de la siguiente manera: la Secci\'on~\ref{sec:related}
@@ -136,20 +125,20 @@ de 0,57, superando a las cuotas del mercado.
 En el extremo de gran escala, Berrar \emph{et al.}~\cite{berrar2019,berrar2024} trabajan
 con 216\,000 y m\'as de 300\,000 partidos de decenas de ligas usando datos ``simples''
 (fecha, equipos, liga y marcador), pero eval\'uan con el \emph{Ranked Probability Score} y
-un repertorio reducido de algoritmos (principalmente $k$-NN y \emph{boosting}); en su
-edici\'on de 2024, ni el mejor modelo logr\'o batir al operador de apuestas. St\"ubinger
-\emph{et al.}~\cite{stubinger2020} alcanzan una exactitud del 81,8\%, pero mediante una
-\emph{regresi\'on} de la diferencia de goles con empates excluidos, por lo que su cifra no
-es comparable con una clasificaci\'on de tres v\'ias. Atta Mills \emph{et al.}~\cite{attamills2024}
-obtienen 0,83 de exactitud con un ensamble \emph{voting}, aunque incorporando
-\emph{features} de medio tiempo (\emph{in-game}) que no est\'an disponibles antes del
-partido. En el plano metodol\'ogico, Bunker y Thabtah~\cite{bunker2019} advierten
+un repertorio reducido de algoritmos (principalmente $k$ vecinos m\'as cercanos, $k$-NN, y
+\emph{boosting}); en su edici\'on de 2024, ni el mejor modelo logr\'o batir al operador de
+apuestas. St\"ubinger \emph{et al.}~\cite{stubinger2020} alcanzan una exactitud del 81,8\%,
+pero mediante una \emph{regresi\'on} de la diferencia de goles con empates excluidos, por lo
+que su cifra no es comparable con una clasificaci\'on de tres v\'ias. Atta Mills \emph{et
+al.}~\cite{attamills2024} obtienen 0,83 de exactitud con un ensamble \emph{voting}, aunque
+incorporando \emph{features} de medio tiempo (\emph{in-game}) que no est\'an disponibles
+antes del partido. En el plano metodol\'ogico, Bunker y Thabtah~\cite{bunker2019} advierten
 expl\'icitamente contra la validaci\'on cruzada aleatoria en datos con orden temporal y
 proponen esquemas por rondas, recomendaci\'on reforzada por Bunker \emph{et al.}~\cite{bunker2024}.
 
 Es preciso advertir que estas cifras \emph{no} son directamente comparables entre s\'i,
-pues los trabajos emplean formulaciones y m\'etricas heterog\'eneas ---clasificaci\'on de
-tres v\'ias, regresi\'on de la diferencia de goles o puntajes probabil\'isticos--- y
+pues los trabajos emplean formulaciones y m\'etricas heterog\'eneas (clasificaci\'on de
+tres v\'ias, regresi\'on de la diferencia de goles o puntajes probabil\'isticos) y
 subconjuntos de dificultad dispar. Contrastar la exactitud de una regresi\'on con empates
 excluidos frente a una clasificaci\'on multiclase equivaldr\'ia a comparar magnitudes
 distintas. Por ello, el presente estudio fija de antemano un protocolo \'unico
@@ -161,8 +150,8 @@ La Tabla~\ref{tab:gap} sintetiza esta comparaci\'on. Del contraste emergen tres 
 35\%; (ii)~el techo realista de exactitud previa al partido en tres clases se sit\'ua en
 torno al 52--57\%; y (iii)~los m\'etodos basados en \'arboles (\emph{Random Forest} y
 \emph{gradient boosting}) son ganadores recurrentes. La brecha que este trabajo aborda es
-clara: ning\'un estudio compara simult\'aneamente seis clasificadores modernos ---incluidos
-LightGBM y CatBoost--- con m\'etricas por clase y prueba de significancia sobre un conjunto
+clara: ning\'un estudio compara simult\'aneamente seis clasificadores modernos (incluidos
+LightGBM y CatBoost) con m\'etricas por clase y prueba de significancia sobre un conjunto
 de escala superior a 200\,000 partidos multi-liga.
 
 \begin{table}[t]
@@ -193,12 +182,13 @@ comparables con predicci\'on estrictamente previa al partido.\par}
 \section{Descripci\'on del Conjunto de Datos y An\'alisis Exploratorio}\label{sec:dataset}
 Se emplea el conjunto p\'ublico \emph{Club Football Match Data (2000--2025)}, que re\'une
 230\,557 partidos de m\'ultiples ligas internacionales con 48 columnas originales, entre
-ellas \emph{ratings} Elo, forma reciente, estad\'isticas del partido y cuotas de mercado.
-La variable objetivo es \texttt{FTResult}$\in\{H,D,A\}$. Tras eliminar tres registros sin
-etiqueta, el conjunto operativo asciende a 230\,554 instancias.
+ellas \emph{ratings} Elo (sistema de puntuaci\'on que estima la fuerza relativa de cada
+equipo a partir de resultados hist\'oricos), forma reciente, estad\'isticas del partido y
+cuotas de mercado. La variable objetivo es \texttt{FTResult}$\in\{H,D,A\}$. Tras eliminar
+tres registros sin etiqueta, el conjunto operativo asciende a 230\,554 instancias.
 
 El an\'alisis exploratorio revela cuatro propiedades que condicionan todo el modelado.
-Primero, existe un \textbf{desbalance moderado} (Fig.~\ref{fig:balance}): la victoria local
+Primero, existe un desbalance moderado (Fig.~\ref{fig:balance}): la victoria local
 representa el 44,6\%, la visitante el 28,9\% y el empate el 26,5\%, con una raz\'on de
 desbalance de 1,68. Este r\'egimen desaconseja optimizar la exactitud, pues un clasificador
 que siempre prediga ``local'' ya alcanzar\'ia $\approx 44\%$.
@@ -211,16 +201,16 @@ clase minoritaria, lo que motiva optimizar F1 macro en lugar de exactitud.}
 \label{fig:balance}
 \end{figure}
 
-Segundo, la se\~nal principal es la \textbf{diferencia de Elo}: al ordenar los partidos por
+Segundo, la se\~nal principal es la diferencia de Elo: al ordenar los partidos por
 esta variable, la tasa de victoria local, empate y visitante se separa de forma mon\'otona,
 pero el empate queda siempre en la zona central sin dominar ninguna regi\'on
-(Fig.~\ref{fig:elo}). Esto anticipa una \textbf{frontera de decisi\'on no lineal} alrededor
+(Fig.~\ref{fig:elo}). Esto anticipa una frontera de decisi\'on no lineal alrededor
 del cero, favorable a \'arboles y \emph{kernels}. Tercero, se detecta
-\textbf{multicolinealidad exacta}: las variables de diferencia son combinaciones lineales
+multicolinealidad exacta: las variables de diferencia son combinaciones lineales
 de sus componentes, lo que se traduce en factores de inflaci\'on de varianza infinitos y en
 autovalores nulos del an\'alisis de componentes principales. Cuarto, el \emph{rating} Elo
-presenta ausencias \textbf{estructurales por liga} (las competiciones no europeas carecen
-de \'el) y el conjunto exhibe \textbf{deriva temporal}, con una ca\'ida de la ventaja local
+presenta ausencias estructurales por liga (las competiciones no europeas carecen
+de \'el) y el conjunto exhibe deriva temporal, con una ca\'ida de la ventaja local
 durante la pandemia.
 
 \begin{figure}[t]
@@ -273,32 +263,32 @@ origen de la multicolinealidad exacta.}
 El preprocesamiento se dise\~n\'o para respetar la higiene anti-fuga exigida por la
 naturaleza temporal del problema. Se descartaron las columnas posteriores al partido
 (estad\'isticas de juego, marcador y variables de medio tiempo), que constituyen fuga
-directa, y ---por decisi\'on de dise\~no--- las cuotas de mercado, con el fin de evaluar el
+directa, y, por decisi\'on de dise\~no, las cuotas de mercado, con el fin de evaluar el
 poder predictivo ``honesto'' del sistema sin la muleta del operador de apuestas.
 
 El \emph{rating} Elo se reconstruy\'o mediante una uni\'on temporal (\emph{merge-asof}) con
 la restricci\'on $\text{fecha}\le\text{fecha del partido}$ para evitar fuga, y las ausencias
 estructurales se se\~nalizaron con una bandera expl\'icita. A partir de las variables
-seguras se construy\'o un conjunto de \emph{features} de ingenier\'ia ---diferencia de Elo,
+seguras se construy\'o un conjunto de \emph{features} de ingenier\'ia (diferencia de Elo,
 forma reciente, promedios m\'oviles de goles a favor y en contra, historial directo, d\'ias
-de descanso, rachas y pertenencia a liga top--- calculados \'unicamente con partidos
+de descanso, rachas y pertenencia a liga top), calculados \'unicamente con partidos
 anteriores a cada fila.
 
-La partici\'on es \textbf{estrictamente temporal}: entrenamiento hasta 2021 (191\,099
+La partici\'on es estrictamente temporal: entrenamiento hasta 2021 (191\,099
 instancias), validaci\'on 2022--2023 (24\,669) y prueba 2024--2025 (14\,786), con frontera
 verificada. La justificaci\'on te\'orica es la desigualdad de generalizaci\'on: la cota de
 Vapnik--Chervonenkis exige fijar la hip\'otesis \emph{antes} de tocar el conjunto de
 evaluaci\'on, y una validaci\'on cruzada aleatoria sobre datos temporales introducir\'ia
 partidos del futuro en el entrenamiento, sesgando la estimaci\'on del error.
 
-La estandarizaci\'on de las variables continuas se calcul\'o \textbf{solo sobre el
-entrenamiento} y se aplic\'o de forma ciega al resto:
+La estandarizaci\'on de las variables continuas se calcul\'o solo sobre el
+entrenamiento y se aplic\'o de forma ciega al resto:
 \begin{equation}
 x'_{ij} = \frac{x_{ij}-\mu_j}{\sigma_j},
 \end{equation}
 donde $\mu_j$ y $\sigma_j$ son la media y la desviaci\'on est\'andar de la caracter\'istica
 $j$ estimadas en el entrenamiento. Las variables de liga se codificaron con
-\emph{one-hot}, resultando una matriz final de \textbf{62 caracter\'isticas}. Como control
+\emph{one-hot}, resultando una matriz final de 62 caracter\'isticas. Como control
 de la multicolinealidad, se computa un an\'alisis de componentes principales sobre las
 variables continuas: la varianza acumulada alcanza el 95\% con 13 componentes
 (Fig.~\ref{fig:pca}), y aparecen cinco autovalores nulos que confirman las cinco
@@ -339,41 +329,42 @@ macro:
 \begin{equation}
 \mathrm{CV}(\lambda)=\frac{1}{K}\sum_{i=1}^{K}\mathrm{F1}_{\text{macro}}\!\left(g^{-}_{\lambda,i}\right).
 \end{equation}
-La m\'etrica de optimizaci\'on es la \textbf{F1 macro}, que pondera por igual las tres
+La m\'etrica de optimizaci\'on es la F1 macro, que pondera por igual las tres
 clases y penaliza ignorar el empate:
 \begin{equation}
 \mathrm{F1}_{\text{macro}}=\frac{1}{3}\sum_{c\in\{H,D,A\}}\frac{2P_cR_c}{P_c+R_c}.
 \end{equation}
 El reporte final incluye \emph{precision}, \emph{recall} y F1 por clase, el coeficiente
-$\kappa$ de Cohen, el \'area bajo la curva ROC \emph{uno-contra-el-resto}, la matriz de
+$\kappa$ de Cohen, el \'area bajo la curva ROC (AUC, del ingl\'es \emph{Area Under the
+Receiver Operating Characteristic Curve}) en su variante uno-contra-el-resto, la matriz de
 confusi\'on y la p\'erdida logar\'itmica.
 
 \subsection{Modelos y fundamentos}
-Se evaluaron nueve familias. Como \textbf{l\'ineas base}, un clasificador ingenuo
+Se evaluaron nueve familias. Como l\'ineas base, un clasificador ingenuo
 (clase mayoritaria) y \emph{Naive Bayes} gaussiano,
 $\hat{y}=\arg\max_c P(c)\prod_j P(x_j\mid c)$, cuyo supuesto de independencia lo penaliza
-en presencia de variables correlacionadas. Como \textbf{modelos lineales/de margen}, la
-\textbf{regresi\'on log\'istica multinomial} con regularizaci\'on de Tikhonov,
+en presencia de variables correlacionadas. Como modelos lineales y de margen, la
+regresi\'on log\'istica multinomial con regularizaci\'on de Tikhonov,
 \begin{equation}
 \mathcal{L}=-\sum_i\log P(y_i\mid x_i)+\lambda\lVert W\rVert^2,
 \end{equation}
 donde el t\'ermino $\lambda\lVert W\rVert^2$ vuelve invertible la matriz singular por la
-colinealidad; y la \textbf{m\'aquina de vectores de soporte}, que maximiza el margen
-$1/\lVert w\rVert$ y cuyo \emph{kernel} de base radial
+colinealidad; y la m\'aquina de vectores de soporte (SVM, del ingl\'es \emph{Support Vector
+Machine}), que maximiza el margen $1/\lVert w\rVert$ y cuyo \emph{kernel} de base radial
 $K(x,x')=\exp(-\gamma\lVert x-x'\rVert^2)$ habilita fronteras no lineales.
 
-Como \textbf{m\'etodos de \'arbol}, un \textbf{\'arbol de decisi\'on} que maximiza la
-ganancia de informaci\'on $IG(Y,X)=H(Y)-H(Y\mid X)$; un \textbf{Random Forest}, cuya
+Como m\'etodos de \'arbol, un \'arbol de decisi\'on que maximiza la
+ganancia de informaci\'on $IG(Y,X)=H(Y)-H(Y\mid X)$; un Random Forest, cuya
 varianza del promedio de $B$ \'arboles con correlaci\'on $\rho$ es
 $\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$, reducida al descorrelacionar mediante selecci\'on
-aleatoria de atributos; y \textbf{AdaBoost}, que combina aprendices d\'ebiles con
-$\alpha_m=\tfrac12\ln\frac{1-\epsilon_m}{\epsilon_m}$. Como \textbf{valor a\~nadido}, los
+aleatoria de atributos; y AdaBoost, que combina aprendices d\'ebiles con
+$\alpha_m=\tfrac12\ln\frac{1-\epsilon_m}{\epsilon_m}$. Como valor a\~nadido, los
 tres motores de \emph{gradient boosting} (XGBoost, LightGBM y CatBoost), que ajustan en
 cada ronda un \'arbol al gradiente de la p\'erdida con regularizaci\'on de segundo orden:
 \begin{equation}
 \mathcal{L}^{(t)}\!\approx\!\sum_i\!\Big[g_i f_t(x_i)+\tfrac12 h_i f_t(x_i)^2\Big]+\gamma T+\tfrac12\lambda\lVert w\rVert^2,
 \end{equation}
-y un \textbf{ensamble} (\emph{voting} y \emph{stacking}) que, por el teorema del jurado de
+y un ensamble (\emph{voting} y \emph{stacking}) que, por el teorema del jurado de
 Condorcet, mejora el consenso de modelos diversos.
 
 \subsection{Selecci\'on de hiperpar\'ametros}
@@ -415,7 +406,9 @@ b\'usqueda y pliegue. El entrenamiento de los modelos de \emph{boosting} se acel
 GPU (NVIDIA RTX 3060) mediante \texttt{device='cuda'} en XGBoost y \texttt{task\_type='GPU'}
 en CatBoost. Cada \emph{script} vuelca sus m\'etricas y tiempos a \texttt{results/} y sus
 figuras a \texttt{figures/}, y el cuaderno \texttt{3.0-modeling-evaluation.ipynb} reproduce
-la metodolog\'ia de principio a fin sin errores.
+la metodolog\'ia de principio a fin sin errores. El c\'odigo fuente completo, los datos
+procesados y este art\'iculo est\'an disponibles p\'ublicamente en el repositorio del
+proyecto: \url{https://github.com/Arbues/football-prediction}.
 
 En cuanto al costo computacional, la aceleraci\'on por GPU result\'o decisiva para los
 modelos de \emph{boosting}: la b\'usqueda de hiperpar\'ametros de XGBoost sobre las 191\,099
@@ -487,8 +480,8 @@ SVM lineal      & \textbf{0,612} & 0,008 & 0,384 & 0,004 \\
 
 \subsection{La trampa de la exactitud}
 La comparaci\'on con la l\'inea base ingenua es decisiva. El clasificador \emph{Dummy}, que
-siempre predice la clase mayoritaria, alcanza una exactitud de 0,434 ---apenas por debajo
-del 0,44 del mejor modelo---, pero su F1 macro es de solo 0,202 y su $\kappa$ es nulo. La
+siempre predice la clase mayoritaria, alcanza una exactitud de 0,434, apenas por debajo
+del 0,44 del mejor modelo, pero su F1 macro es de solo 0,202 y su $\kappa$ es nulo. La
 exactitud, por tanto, \emph{no} distingue un modelo \'util de uno in\'util en presencia de
 desbalance. La superioridad real del sistema se manifiesta en el F1 macro (que se duplica),
 en el coeficiente $\kappa$ (que pasa de 0 a $\approx0{,}15$) y en el AUC (de 0,50 a 0,61).
@@ -523,7 +516,7 @@ La Tabla~\ref{tab:imbalance} compara tres estrategias con una configuraci\'on de
 fija. Sin balanceo, el modelo pr\'acticamente no predice empates (sensibilidad de $D$ de
 0,008), a pesar de una exactitud mayor. El reponderado por clase es la \'unica estrategia
 que eleva simult\'aneamente el F1 macro y la sensibilidad del empate. SMOTE apenas ayuda:
-al interpolar entre empates ---adem\'as sobre variables \emph{one-hot}--- genera puntos que
+al interpolar entre empates (adem\'as sobre variables \emph{one-hot}) genera puntos que
 caen en zonas ya dominadas por otras clases, sin crear frontera nueva, coherente con la
 ausencia de regi\'on propia del empate.
 
@@ -545,7 +538,7 @@ SMOTE          & 0,356 & 0,016 & 0,484 \\
 
 \subsection{Interpretabilidad}
 El an\'alisis SHAP sobre el modelo de \emph{boosting} (Fig.~\ref{fig:shap}) identifica la
-\textbf{diferencia de Elo} como la variable dominante, muy por encima del historial directo,
+diferencia de Elo como la variable dominante, muy por encima del historial directo,
 la forma reciente y el balance de goles. Este resultado coincide con la importancia por
 permutaci\'on del \emph{Random Forest} y confirma cuantitativamente la lectura del an\'alisis
 exploratorio: la diferencia de calidad entre equipos explica la mayor parte de lo predecible.
@@ -584,8 +577,8 @@ por tanto, es consistente a lo largo del tiempo y no atribuible a variabilidad e
 \section{Discusi\'on}\label{sec:discussion}
 Los resultados admiten una lectura unificada a partir de las propiedades detectadas en el
 an\'alisis exploratorio. El liderazgo (marginal) de los m\'etodos de \emph{boosting} y del
-ensamble, junto con el contraste entre el SVM lineal ---que hunde la sensibilidad del empate
-a casi cero--- y el SVM de \emph{kernel} radial ---que la eleva a 0,31---, confirma que la
+ensamble, junto con el contraste entre el SVM lineal (que hunde la sensibilidad del empate
+a casi cero) y el SVM de \emph{kernel} radial (que la eleva a 0,31), confirma que la
 frontera de decisi\'on es no lineal. Sin embargo, la agrupaci\'on estrecha de todos los
 modelos competentes indica que, en ausencia de cuotas de mercado, la se\~nal disponible tiene
 un techo bajo, y ning\'un algoritmo lo supera de forma dram\'atica. El empate act\'ua como
@@ -594,26 +587,26 @@ sensibilidad est\'a acotada con independencia del clasificador. El \emph{stackin
 mejor F1 macro porque su meta-modelo aprende a ponderar la fortaleza de cada base seg\'un la
 regi\'on del espacio.
 
-\textbf{Amenazas a la validez interna.} El principal riesgo, la fuga temporal, se mitiga con
+\textit{Amenazas a la validez interna.} El principal riesgo, la fuga temporal, se mitiga con
 la partici\'on por fecha y la validaci\'on con \texttt{TimeSeriesSplit}; la ausencia de
 exactitudes sospechosamente altas ($>65\%$) es coherente con un pipeline sin fuga. El
 ensamble por apilamiento emplea un esquema de validaci\'on interno estratificado para generar
 las predicciones fuera de pliegue, mientras la integridad temporal se preserva en el nivel
 externo, con validaci\'on y prueba intactas.
 
-\textbf{Amenazas a la validez externa.} El modelo se entren\'o sin cuotas de mercado, por lo
+\textit{Amenazas a la validez externa.} El modelo se entren\'o sin cuotas de mercado, por lo
 que su techo es inherentemente inferior al de sistemas que las incorporan; su capacidad de
 generalizaci\'on a ligas o temporadas con din\'amicas muy distintas (por ejemplo, la deriva
 observada durante la pandemia) no est\'a garantizada. Adem\'as, la ausencia estructural de
 Elo en ligas no europeas limita la homogeneidad de la se\~nal entre competiciones.
 
 \subsection{Consideraciones \'eticas}
-El conjunto de datos no contiene atributos personales sensibles ---g\'enero, etnia o
-condici\'on socioecon\'omica de individuos---: las entidades son clubes y sus estad\'isticas
+El conjunto de datos no contiene atributos personales sensibles (g\'enero, etnia o
+condici\'on socioecon\'omica de individuos): las entidades son clubes y sus estad\'isticas
 deportivas agregadas, por lo que no procede un an\'alisis de sesgos demogr\'aficos. No
 obstante, un sistema de predicci\'on de resultados deportivos puede emplearse en mercados de
 apuestas; su uso responsable exige comunicar con transparencia la elevada incertidumbre del
-modelo ---evidenciada por el techo de rendimiento--- y no presentarlo como una herramienta
+modelo, evidenciada por el techo de rendimiento, y no presentarlo como una herramienta
 de ganancia garantizada.
 
 \section{Conclusiones y Trabajo Futuro}\label{sec:conclusions}
